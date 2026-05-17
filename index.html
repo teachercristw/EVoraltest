@@ -101,14 +101,26 @@
     /* Clean Student Grid Elements */
     #student-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
         gap: 12px; margin-top: 20px; width: 100%; max-width: 1000px;
     }
     .student-btn {
-        font-family: var(--main-font); font-weight: bold; font-size: 1.1rem; padding: 12px 10px; border: none;
-        border-radius: 12px; background-color: var(--white); color: var(--secondary-dark); cursor: pointer;
-        box-shadow: 0 4px 0 rgba(0,0,0,0.15); transition: transform 0.1s, box-shadow 0.1s, background-color 0.2s;
-        width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        font-family: var(--main-font); 
+        font-weight: bold; 
+        font-size: 1.1rem; 
+        padding: 12px 15px; /* Added left padding for breathing room */
+        border: none;
+        border-radius: 12px; 
+        background-color: var(--white); 
+        color: var(--secondary-dark); 
+        cursor: pointer;
+        box-shadow: 0 4px 0 rgba(0,0,0,0.15); 
+        transition: transform 0.1s, box-shadow 0.1s, background-color 0.2s;
+        width: 100%; 
+        white-space: nowrap; 
+        overflow: hidden; 
+        text-overflow: ellipsis;
+        text-align: left; /* Aligns the student name neatly to the left */
     }
     .student-btn:active { transform: translateY(4px); box-shadow: 0 0 0 rgba(0,0,0,0.15); }
     .student-btn.completed {
@@ -132,7 +144,7 @@
     .mcq-container h3 { margin: 0 0 15px 0; font-size: 1.8rem; color: var(--secondary-dark); }
     .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
     .option-btn { font-family: var(--main-font); font-weight:bold; font-size: 1.5rem; padding: 20px; background-color: #EDF2F7; color: var(--text-dark); box-shadow: 0 6px 0 #CBD5E0; border:none; border-radius:15px; cursor:pointer; }
-    .option-btn.selected { background-color: var(--primary); box-shadow: 0 6px 0 var(--primary-dark); color: var(--secondary-dark); }
+    .option-btn.selected { background-color: var(--primary); box-shadow: 0 6px 0 var(--primary-dark); color: var(--secondary-dark); text-align: center; }
 
     /* Gear Icon */
     #gear-btn {
