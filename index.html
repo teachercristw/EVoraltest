@@ -159,8 +159,8 @@
         box-sizing: border-box; overflow-y: auto; color: white; font-family: Arial, sans-serif; font-weight: normal;
     }
     #help-modal { z-index: 300; background: rgba(20, 22, 35, 0.99); }
-    .dash-container { max-width: 900px; margin: 0 auto; background: #0077B6; padding: 30px; border-radius: 10px; border: 4px solid var(--primary); }
-    .dash-container h1 { font-size: 2rem; margin: 0 0 10px 0; color: white; }
+    .dash-container { max-width: 1000px; margin: 0 auto; background: #0077B6; padding: 30px; border-radius: 10px; border: 4px solid var(--primary); }
+    .dash-container h1 { font-size: 2.2rem; margin: 0 0 20px 0; color: white; }
     .dash-container h2 { font-size: 1.5rem; margin: 0 0 15px 0; color: var(--primary); }
     .dash-label { font-size: 0.9rem; margin-top: 10px; display: block; font-weight: bold; color: #FFF; }
     .dash-input { 
@@ -177,6 +177,15 @@
     .dash-btn.small { padding: 5px 10px; font-size: 0.85rem; }
     .dash-btn.help-btn { background: var(--accent); color: white; }
     hr { border: 0; border-top: 1px solid #CAF0F8; margin: 20px 0; opacity: 0.3; }
+
+    /* TABS CSS */
+    .dash-tabs { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 3px solid rgba(255,255,255,0.2); padding-bottom: 10px; overflow-x: auto; }
+    .dash-tab-btn { background: rgba(0,0,0,0.2); color: white; border: none; padding: 12px 25px; border-radius: 8px 8px 0 0; font-size: 1.1rem; cursor: pointer; font-weight: bold; white-space: nowrap; }
+    .dash-tab-btn:hover { background: rgba(0,0,0,0.3); }
+    .dash-tab-btn.active { background: var(--primary); color: var(--secondary-dark); }
+    .dash-tab-content { display: none; }
+    .dash-tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
     .help-list li { margin-bottom: 15px; font-size: 1.1rem; line-height: 1.5; }
     .help-code { width: 100%; height: 300px; font-family: monospace; font-size: 0.9rem; background: #1A202C; color: #A0AEC0; padding: 15px; border-radius: 5px; border: 1px solid #4A5568; white-space: pre; }
@@ -253,71 +262,92 @@
         <div class="dash-container">
             <h1>⚙️ Teacher Dashboard</h1>
             
-            <div style="background: rgba(0,0,0,0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 2px solid rgba(255,255,255,0.2);">
-                <h2 style="margin-top:0;">1. Test Organization & Look</h2>
-                
-                <div class="grid-2">
-                    <div>
-                        <label class="dash-label">Semester:</label>
-                        <select id="dash-semester" class="dash-input">
-                            <option value="First Semester">First Semester</option>
-                            <option value="Second Semester">Second Semester</option>
-                        </select>
+            <!-- Dashboard Tabs Navigation -->
+            <div class="dash-tabs">
+                <button class="dash-tab-btn active" onclick="openDashTab('tab-general')">⚙️ General Settings</button>
+                <button class="dash-tab-btn" onclick="openDashTab('tab-rosters')">👥 Class Rosters</button>
+                <button class="dash-tab-btn" onclick="openDashTab('tab-cards')">📝 Test Cards</button>
+                <button class="dash-tab-btn" onclick="openDashTab('tab-backup')">💾 Backup / Restore</button>
+            </div>
+
+            <!-- TAB 1: General Settings -->
+            <div id="tab-general" class="dash-tab-content active">
+                <div style="background: rgba(0,0,0,0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <div class="grid-2">
+                        <div>
+                            <label class="dash-label">Semester:</label>
+                            <select id="dash-semester" class="dash-input">
+                                <option value="First Semester">First Semester</option>
+                                <option value="Second Semester">Second Semester</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="dash-label">Grade Level:</label>
+                            <select id="dash-grade" class="dash-input">
+                                <option value="Grade 1">Grade 1</option>
+                                <option value="Grade 2">Grade 2</option>
+                                <option value="Grade 3">Grade 3</option>
+                                <option value="Grade 4">Grade 4</option>
+                                <option value="Grade 5">Grade 5</option>
+                                <option value="Grade 6">Grade 6</option>
+                            </select>
+                        </div>
                     </div>
-                    <div>
-                        <label class="dash-label">Grade Level:</label>
-                        <select id="dash-grade" class="dash-input">
-                            <option value="Grade 1">Grade 1</option>
-                            <option value="Grade 2">Grade 2</option>
-                            <option value="Grade 3">Grade 3</option>
-                            <option value="Grade 4">Grade 4</option>
-                            <option value="Grade 5">Grade 5</option>
-                            <option value="Grade 6">Grade 6</option>
-                        </select>
+
+                    <div class="grid-2" style="margin-top: 10px;">
+                        <div>
+                            <label class="dash-label">Timer Duration (Seconds):</label>
+                            <input type="number" id="dash-timer" class="dash-input">
+                        </div>
+                        <div>
+                            <label class="dash-label">Game Font Style:</label>
+                            <select id="dash-font" class="dash-input">
+                                <option value="'Century Gothic', 'AppleGothic', sans-serif">Century Gothic (Default)</option>
+                                <option value="'Nunito', sans-serif">Nunito (Friendly & Round)</option>
+                                <option value="'Quicksand', sans-serif">Quicksand (Clean & Soft)</option>
+                                <option value="'Patrick Hand', cursive">Patrick Hand (Handwritten)</option>
+                                <option value="'Comic Sans MS', 'Chalkboard SE', sans-serif">Comic Sans (Classic)</option>
+                            </select>
+                        </div>
                     </div>
+
+                    <hr>
+                    <label class="dash-label">Google Script Web App URL (For saving data):</label>
+                    <input type="text" id="dash-script-url" class="dash-input" placeholder="https://script.google.com/macros/s/...">
+                    <button class="dash-btn help-btn" onclick="openHelpModal()">❓ Need Help Setting Up Google Drive?</button>
                 </div>
+            </div>
 
-                <div class="grid-2" style="margin-top: 10px;">
-                    <div>
-                        <label class="dash-label">Timer Duration (Seconds):</label>
-                        <input type="number" id="dash-timer" class="dash-input">
-                    </div>
-                    <div>
-                        <label class="dash-label">Game Font Style:</label>
-                        <select id="dash-font" class="dash-input">
-                            <option value="'Century Gothic', 'AppleGothic', sans-serif">Century Gothic (Default)</option>
-                            <option value="'Nunito', sans-serif">Nunito (Friendly & Round)</option>
-                            <option value="'Quicksand', sans-serif">Quicksand (Clean & Soft)</option>
-                            <option value="'Patrick Hand', cursive">Patrick Hand (Handwritten)</option>
-                            <option value="'Comic Sans MS', 'Chalkboard SE', sans-serif">Comic Sans (Classic)</option>
-                        </select>
-                    </div>
+            <!-- TAB 2: Class Rosters -->
+            <div id="tab-rosters" class="dash-tab-content">
+                <div style="background: rgba(0,0,0,0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <button class="dash-btn action small" onclick="addRosterCard()">➕ Add Class Roster</button>
+                    <p style="color:white; font-size:0.9rem;">Add a class block, name it, and paste the students below it. They will automatically appear as buttons on the home screen!</p>
+                    <div id="roster-container"></div>
                 </div>
-
-                <hr>
-                <label class="dash-label">Google Script Web App URL (For saving data):</label>
-                <input type="text" id="dash-script-url" class="dash-input" placeholder="https://script.google.com/macros/s/...">
-                <button class="dash-btn help-btn" onclick="openHelpModal()">❓ Need Help Setting Up Google Drive?</button>
-            </div>
-            
-            <div style="background: rgba(0,0,0,0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 2px solid rgba(255,255,255,0.2);">
-                <h2 style="margin-top:0; display:inline-block; margin-right: 20px;">2. Class Rosters</h2>
-                <button class="dash-btn action small" onclick="addRosterCard()">➕ Add Class Roster</button>
-                <p style="color:white; font-size:0.9rem;">Add a class block, name it, and paste the students below it. They will automatically appear as buttons on the home screen!</p>
-                <div id="roster-container"></div>
             </div>
 
-            <div style="margin-bottom: 20px;">
-                <h2 style="display:inline-block; margin-right: 20px;">3. Question Cards</h2>
-                <button class="dash-btn action" onclick="addQuestionCard()">➕ Add New Test Card</button>
-                <button class="dash-btn action" onclick="exportData()">💾 Export Everything (Backup)</button>
-                <button class="dash-btn action" onclick="document.getElementById('import-file').click()">📂 Import Backup</button>
-                <input type="file" id="import-file" style="display:none;" accept=".json" onchange="importData(event)">
+            <!-- TAB 3: Test Cards -->
+            <div id="tab-cards" class="dash-tab-content">
+                <div style="margin-bottom: 20px;">
+                    <button class="dash-btn action" onclick="addQuestionCard()">➕ Add New Test Card</button>
+                </div>
+                <div id="editor-container"></div>
             </div>
 
-            <div id="editor-container"></div>
+            <!-- TAB 4: Backup / Restore -->
+            <div id="tab-backup" class="dash-tab-content">
+                <div style="background: rgba(0,0,0,0.1); padding: 25px; border-radius: 8px; text-align: center;">
+                    <h2 style="color: white; margin-top:0;">Save or Load Your Setup</h2>
+                    <p style="color: white;">Moving to a new computer? Export your data here and import it on the new machine so you don't lose your questions or rosters!</p>
+                    <button class="dash-btn action" style="font-size: 1.5rem; padding: 15px 30px;" onclick="exportData()">💾 Export Data (Backup)</button>
+                    <button class="dash-btn help-btn" style="font-size: 1.5rem; padding: 15px 30px;" onclick="document.getElementById('import-file').click()">📂 Import Backup File</button>
+                    <input type="file" id="import-file" style="display:none;" accept=".json" onchange="importData(event)">
+                </div>
+            </div>
 
-            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #CAF0F8;">
+            <!-- Global Action Buttons -->
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #CAF0F8;">
                 <button class="dash-btn save" style="font-size: 1.2rem; padding: 15px 30px;" onclick="saveDashboard()">Save Settings ✅</button>
                 <button class="dash-btn danger" style="font-size: 1.2rem; padding: 15px 30px;" onclick="closeDashboard()">Cancel ❌</button>
             </div>
@@ -435,24 +465,21 @@ const defaultConfig = {
 
 let config = JSON.parse(localStorage.getItem('oralTestConfig')) || defaultConfig;
 let pool = [];
-let completedStudents = {}; // Session Storage for graying out students
+let completedStudents = {}; 
 
 // Initialize App
 document.body.style.setProperty('--main-font', config.fontFamily || "'Century Gothic', 'AppleGothic', sans-serif");
 document.getElementById('display-test-info').innerText = `${config.semester} | ${config.grade}`;
 renderClassDropdown();
 
-// ALPHANUMERIC SORTING LOGIC ADDED HERE
 function renderClassDropdown() {
     const classSel = document.getElementById('class-select');
     classSel.innerHTML = '<option value="">-- Select Class --</option>';
     if(config.roster && config.roster.length > 0) {
-        
-        // Advanced Sorting Logic: Numbers sort properly (e.g. 2 comes before 10)
+        // Alphanumeric Sort
         let sortedRoster = [...config.roster].sort((a, b) => {
             return a.className.localeCompare(b.className, undefined, { numeric: true, sensitivity: 'base' });
         });
-
         sortedRoster.forEach(r => {
             let opt = document.createElement('option');
             opt.value = r.className; opt.innerText = r.className;
@@ -620,21 +647,32 @@ function submitToDrive() {
 function resetGame() { playClick(); switchScreen('start-screen'); renderStudentGrid(); }
 
 // ==========================================
-// TEACHER DASHBOARD GUI 
+// TEACHER DASHBOARD GUI (TABBED)
 // ==========================================
 function openDashboard() {
     playSelect(); document.getElementById('dashboard-modal').style.display = 'block';
+    
+    // Load Settings
     document.getElementById('dash-semester').value = config.semester || "First Semester";
     document.getElementById('dash-grade').value = config.grade || "Grade 1";
     document.getElementById('dash-script-url').value = config.scriptUrl || DEFAULT_URL;
     document.getElementById('dash-timer').value = config.timerSeconds || 70;
     document.getElementById('dash-font').value = config.fontFamily || "'Century Gothic', 'AppleGothic', sans-serif";
-    renderRosterEditor(); renderCardEditor();
+    
+    renderRosterEditor(); renderCardEditor(); openDashTab('tab-general'); // default tab
 }
 
 function closeDashboard() { playClick(); document.getElementById('dashboard-modal').style.display = 'none'; }
 function openHelpModal() { playClick(); document.getElementById('help-modal').style.display = 'block'; }
 function closeHelpModal() { playClick(); document.getElementById('help-modal').style.display = 'none'; }
+
+function openDashTab(tabId) {
+    playClick();
+    document.querySelectorAll('.dash-tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.dash-tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    event.currentTarget.classList.add('active');
+}
 
 function syncDashboardToConfig() {
     let newRoster = [];
