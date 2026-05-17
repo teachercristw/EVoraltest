@@ -159,8 +159,8 @@
         box-sizing: border-box; overflow-y: auto; color: white; font-family: Arial, sans-serif; font-weight: normal;
     }
     #help-modal { z-index: 300; background: rgba(20, 22, 35, 0.99); }
-    .dash-container { max-width: 1000px; margin: 0 auto; background: #0077B6; padding: 30px; border-radius: 10px; border: 4px solid var(--primary); }
-    .dash-container h1 { font-size: 2.2rem; margin: 0 0 20px 0; color: white; }
+    .dash-container { max-width: 900px; margin: 0 auto; background: #0077B6; padding: 30px; border-radius: 10px; border: 4px solid var(--primary); }
+    .dash-container h1 { font-size: 2rem; margin: 0 0 10px 0; color: white; }
     .dash-container h2 { font-size: 1.5rem; margin: 0 0 15px 0; color: var(--primary); }
     .dash-label { font-size: 0.9rem; margin-top: 10px; display: block; font-weight: bold; color: #FFF; }
     .dash-input { 
@@ -273,17 +273,19 @@
             <!-- TAB 1: General Settings -->
             <div id="tab-general" class="dash-tab-content active">
                 <div style="background: rgba(0,0,0,0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <h2 style="margin-top:0; color:white;">Active Test Assignment</h2>
+                    <p style="color:#CAF0F8; margin-bottom:15px;">Which test are the students taking right now?</p>
                     <div class="grid-2">
                         <div>
-                            <label class="dash-label">Semester:</label>
-                            <select id="dash-semester" class="dash-input">
+                            <label class="dash-label">Active Semester:</label>
+                            <select id="dash-active-semester" class="dash-input">
                                 <option value="First Semester">First Semester</option>
                                 <option value="Second Semester">Second Semester</option>
                             </select>
                         </div>
                         <div>
-                            <label class="dash-label">Grade Level:</label>
-                            <select id="dash-grade" class="dash-input">
+                            <label class="dash-label">Active Grade Level:</label>
+                            <select id="dash-active-grade" class="dash-input">
                                 <option value="Grade 1">Grade 1</option>
                                 <option value="Grade 2">Grade 2</option>
                                 <option value="Grade 3">Grade 3</option>
@@ -293,7 +295,9 @@
                             </select>
                         </div>
                     </div>
-
+                    
+                    <hr>
+                    <h2 style="margin-top:0; color:white;">Global Settings</h2>
                     <div class="grid-2" style="margin-top: 10px;">
                         <div>
                             <label class="dash-label">Timer Duration (Seconds):</label>
@@ -311,8 +315,7 @@
                         </div>
                     </div>
 
-                    <hr>
-                    <label class="dash-label">Google Script Web App URL (For saving data):</label>
+                    <label class="dash-label" style="margin-top:20px;">Google Script Web App URL (For saving data):</label>
                     <input type="text" id="dash-script-url" class="dash-input" placeholder="https://script.google.com/macros/s/...">
                     <button class="dash-btn help-btn" onclick="openHelpModal()">❓ Need Help Setting Up Google Drive?</button>
                 </div>
@@ -329,6 +332,16 @@
 
             <!-- TAB 3: Test Cards -->
             <div id="tab-cards" class="dash-tab-content">
+                
+                <div style="background: rgba(0,0,0,0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 2px solid var(--accent);">
+                    <h2 style="margin-top:0; color:white;">Select Test Bank to Edit</h2>
+                    <p style="color:#CAF0F8;">You are currently editing the cards for:</p>
+                    <div class="grid-2">
+                        <select id="editor-semester" class="dash-input" onchange="changeEditTarget()"></select>
+                        <select id="editor-grade" class="dash-input" onchange="changeEditTarget()"></select>
+                    </div>
+                </div>
+
                 <div style="margin-bottom: 20px;">
                     <button class="dash-btn action" onclick="addQuestionCard()">➕ Add New Test Card</button>
                 </div>
@@ -447,36 +460,60 @@ const playWarning = () => { initAudio(); playTone(300, 'sawtooth', 0.3); }
 // --- Game Data & Configuration ---
 const DEFAULT_URL = "https://script.google.com/macros/s/AKfycbwe8u9jinO3KHPTvQy_y1pW8gMeIg9Yk6Qv4ReuC92GFBFJkBw14ZiXfnlWMO6t_rUo/exec";
 
+// Constants for Dropdowns
+const SEMESTERS = ["First Semester", "Second Semester"];
+const GRADES = ["Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5", "Grade 6"];
+
+// Default Config Structure
 const defaultConfig = {
-    semester: "First Semester", grade: "Grade 1", scriptUrl: DEFAULT_URL, timerSeconds: 70, 
+    activeSemester: "First Semester", 
+    activeGrade: "Grade 1", 
+    scriptUrl: DEFAULT_URL, 
+    timerSeconds: 70, 
     fontFamily: "'Century Gothic', 'AppleGothic', sans-serif",
     roster: [
         { className: "3A", students: ["John Doe", "Jane Smith", "Emily Chen", "Michael Wu"] },
-        { className: "3B", students: ["Peter Parker", "Bruce Wayne"] }
+        { className: "10B", students: ["Peter Parker", "Bruce Wayne"] }
     ],
-    cards: [
-        {
-            p1Mode: "auto", sentence: "The quick brown fox jumps over the lazy dog.", manualWords: [], 
-            q1: "What animal jumped?", q1opts: ["A dog", "A fox", "A cat", "A rabbit"], q1ans: 1, q1pts: 5,
-            q2: "What color was the fox?", q2opts: ["Red", "Brown", "Black", "White"], q2ans: 1, q2pts: 5
-        }
-    ]
+    // The new specific question banks structure
+    tests: {
+        "First Semester_Grade 1": [
+            {
+                p1Mode: "auto", sentence: "The quick brown fox jumps over the lazy dog.", manualWords: [], 
+                q1: "What animal jumped?", q1opts: ["A dog", "A fox", "A cat", "A rabbit"], q1ans: 1, q1pts: 5,
+                q2: "What color was the fox?", q2opts: ["Red", "Brown", "Black", "White"], q2ans: 1, q2pts: 5
+            }
+        ]
+    }
 };
 
 let config = JSON.parse(localStorage.getItem('oralTestConfig')) || defaultConfig;
+
+// Data Migration Script (If loading old JSON format, move it to the new structure)
+if(config.cards && !config.tests) {
+    config.tests = {};
+    let fallbackKey = (config.semester || "First Semester") + "_" + (config.grade || "Grade 1");
+    config.tests[fallbackKey] = config.cards;
+    delete config.cards; // Clean up old structure
+    
+    // Set active states if they don't exist
+    if(!config.activeSemester) config.activeSemester = config.semester || "First Semester";
+    if(!config.activeGrade) config.activeGrade = config.grade || "Grade 1";
+}
+
 let pool = [];
 let completedStudents = {}; 
+let currentEditingKey = ""; // Tracks which test bank is open in the editor
 
 // Initialize App
 document.body.style.setProperty('--main-font', config.fontFamily || "'Century Gothic', 'AppleGothic', sans-serif");
-document.getElementById('display-test-info').innerText = `${config.semester} | ${config.grade}`;
+document.getElementById('display-test-info').innerText = `${config.activeSemester} | ${config.activeGrade}`;
 renderClassDropdown();
 
 function renderClassDropdown() {
     const classSel = document.getElementById('class-select');
     classSel.innerHTML = '<option value="">-- Select Class --</option>';
     if(config.roster && config.roster.length > 0) {
-        // Alphanumeric Sort
         let sortedRoster = [...config.roster].sort((a, b) => {
             return a.className.localeCompare(b.className, undefined, { numeric: true, sensitivity: 'base' });
         });
@@ -517,7 +554,13 @@ function shuffle(array) {
 }
 
 function getNextCard() {
-    if (pool.length === 0) { pool = JSON.parse(JSON.stringify(config.cards)); shuffle(pool); }
+    if (pool.length === 0) { 
+        // Pull ONLY the cards for the active semester & grade
+        let key = config.activeSemester + "_" + config.activeGrade;
+        let testBank = config.tests[key] || [];
+        pool = JSON.parse(JSON.stringify(testBank)); 
+        shuffle(pool); 
+    }
     return pool.pop();
 }
 
@@ -530,7 +573,12 @@ function switchScreen(id) {
 function startTest(className, studentName) {
     playClick();
     currentClass = className; currentStudent = studentName;
-    if(config.cards.length === 0) return alert("Teacher: Please add questions in the Dashboard first!");
+    
+    let key = config.activeSemester + "_" + config.activeGrade;
+    if(!config.tests[key] || config.tests[key].length === 0) {
+        return alert("Teacher: There are no questions for this Semester/Grade yet. Please add them in the Dashboard!");
+    }
+    
     activeCard = getNextCard();
     setupPart1(); setupPart2();
     switchScreen('part1-screen'); startTimer();
@@ -635,7 +683,7 @@ function submitToDrive() {
     if(!config.scriptUrl) return alert("Teacher: Set the Google Script URL in Dashboard!");
     const btn = document.getElementById('submit-btn'); btn.innerText = "Saving to Drive... ⏳"; btn.disabled = true;
     const payload = {
-        semester: config.semester, grade: config.grade, className: currentClass, studentName: currentStudent,
+        semester: config.activeSemester, grade: config.activeGrade, className: currentClass, studentName: currentStudent,
         totalScore: part1Score + q1Score + q2Score, readingScore: part1Score, q1Score: q1Score, q2Score: q2Score, missedWords: missedWordsArr.join(", ") || "None"
     };
 
@@ -647,19 +695,38 @@ function submitToDrive() {
 function resetGame() { playClick(); switchScreen('start-screen'); renderStudentGrid(); }
 
 // ==========================================
-// TEACHER DASHBOARD GUI (TABBED)
+// TEACHER DASHBOARD GUI (TABBED + SCOPED CARDS)
 // ==========================================
+
+function populateEditorDropdowns() {
+    const semSel = document.getElementById('editor-semester');
+    const grdSel = document.getElementById('editor-grade');
+    semSel.innerHTML = ''; grdSel.innerHTML = '';
+    
+    SEMESTERS.forEach(s => { let o = document.createElement('option'); o.value = s; o.innerText = s; semSel.appendChild(o); });
+    GRADES.forEach(g => { let o = document.createElement('option'); o.value = g; o.innerText = g; grdSel.appendChild(o); });
+}
+
 function openDashboard() {
     playSelect(); document.getElementById('dashboard-modal').style.display = 'block';
     
-    // Load Settings
-    document.getElementById('dash-semester').value = config.semester || "First Semester";
-    document.getElementById('dash-grade').value = config.grade || "Grade 1";
-    document.getElementById('dash-script-url').value = config.scriptUrl || DEFAULT_URL;
-    document.getElementById('dash-timer').value = config.timerSeconds || 70;
-    document.getElementById('dash-font').value = config.fontFamily || "'Century Gothic', 'AppleGothic', sans-serif";
+    // Load Settings to UI
+    document.getElementById('dash-active-semester').value = config.activeSemester;
+    document.getElementById('dash-active-grade').value = config.activeGrade;
+    document.getElementById('dash-script-url').value = config.scriptUrl;
+    document.getElementById('dash-timer').value = config.timerSeconds;
+    document.getElementById('dash-font').value = config.fontFamily;
     
-    renderRosterEditor(); renderCardEditor(); openDashTab('tab-general'); // default tab
+    renderRosterEditor(); 
+    
+    // Init Card Editor Dropdowns
+    populateEditorDropdowns();
+    document.getElementById('editor-semester').value = config.activeSemester;
+    document.getElementById('editor-grade').value = config.activeGrade;
+    currentEditingKey = config.activeSemester + "_" + config.activeGrade;
+    
+    renderCardEditor(); 
+    openDashTab('tab-general'); // default tab
 }
 
 function closeDashboard() { playClick(); document.getElementById('dashboard-modal').style.display = 'none'; }
@@ -675,6 +742,7 @@ function openDashTab(tabId) {
 }
 
 function syncDashboardToConfig() {
+    // 1. Sync Rosters
     let newRoster = [];
     document.querySelectorAll('.roster-card').forEach(rc => {
         let cName = rc.querySelector('.r-class').value.trim();
@@ -683,6 +751,13 @@ function syncDashboardToConfig() {
     });
     config.roster = newRoster;
 
+    // 2. Sync Editor Cards to current target key
+    syncCardsToConfig(currentEditingKey);
+}
+
+// Safely extracts the DOM cards and saves them to the specified test key
+function syncCardsToConfig(key) {
+    if(!key) return;
     let newCards = [];
     document.querySelectorAll('#editor-container .q-card').forEach(cardDom => {
         let p1Mode = cardDom.querySelector('.c-p1mode').value;
@@ -697,9 +772,12 @@ function syncDashboardToConfig() {
             q2: cardDom.querySelector('.c-q2').value, q2opts: [cardDom.querySelector('.c-q2o0').value, cardDom.querySelector('.c-q2o1').value, cardDom.querySelector('.c-q2o2').value, cardDom.querySelector('.c-q2o3').value], q2ans: parseInt(cardDom.querySelector('.c-q2ans').value), q2pts: parseInt(cardDom.querySelector('.c-q2pts').value) || 0
         });
     });
-    config.cards = newCards;
+    
+    if(!config.tests) config.tests = {};
+    config.tests[key] = newCards;
 }
 
+// Roster Functions
 function renderRosterEditor() {
     const container = document.getElementById('roster-container'); container.innerHTML = '';
     if(!config.roster) config.roster = [];
@@ -717,9 +795,32 @@ function renderRosterEditor() {
 }
 function addRosterCard() { syncDashboardToConfig(); config.roster.push({ className: "", students: [] }); renderRosterEditor(); }
 
+
+// Change Which Test Bank is Being Edited
+function changeEditTarget() {
+    playClick();
+    syncCardsToConfig(currentEditingKey); // Save current work before switching
+    
+    let sem = document.getElementById('editor-semester').value;
+    let grd = document.getElementById('editor-grade').value;
+    currentEditingKey = sem + "_" + grd;
+    
+    renderCardEditor(); // Render the new target's cards
+}
+
+
+// Card Editor Functions
 function renderCardEditor() {
     const container = document.getElementById('editor-container'); container.innerHTML = '';
-    config.cards.forEach((card, index) => {
+    
+    let targetCards = config.tests && config.tests[currentEditingKey] ? config.tests[currentEditingKey] : [];
+
+    if(targetCards.length === 0) {
+        container.innerHTML = '<p style="color:white; font-style:italic;">No questions added for this semester/grade yet.</p>';
+        return;
+    }
+
+    targetCards.forEach((card, index) => {
         const div = document.createElement('div'); div.className = 'q-card';
         let manualWordsHTML = '';
         if(card.manualWords) {
@@ -804,13 +905,25 @@ function addManualWordRow(btnElem) {
     container.appendChild(div);
 }
 
-function addQuestionCard() { syncDashboardToConfig(); config.cards.push({ p1Mode: "auto", sentence: "", manualWords: [], q1: "", q1opts: ["", "", "", ""], q1ans: 0, q1pts: 5, q2: "", q2opts: ["", "", "", ""], q2ans: 0, q2pts: 5 }); renderCardEditor(); }
-function deleteCard(idx) { if(confirm("Delete this card?")) { syncDashboardToConfig(); config.cards.splice(idx, 1); renderCardEditor(); } }
+function addQuestionCard() { 
+    syncCardsToConfig(currentEditingKey); 
+    if(!config.tests[currentEditingKey]) config.tests[currentEditingKey] = [];
+    config.tests[currentEditingKey].push({ p1Mode: "auto", sentence: "", manualWords: [], q1: "", q1opts: ["", "", "", ""], q1ans: 0, q1pts: 5, q2: "", q2opts: ["", "", "", ""], q2ans: 0, q2pts: 5 }); 
+    renderCardEditor(); 
+}
+
+function deleteCard(idx) { 
+    if(confirm("Delete this card?")) { 
+        syncCardsToConfig(currentEditingKey); 
+        config.tests[currentEditingKey].splice(idx, 1); 
+        renderCardEditor(); 
+    } 
+}
 
 function saveDashboard() {
     playClick();
-    config.semester = document.getElementById('dash-semester').value;
-    config.grade = document.getElementById('dash-grade').value;
+    config.activeSemester = document.getElementById('dash-active-semester').value;
+    config.activeGrade = document.getElementById('dash-active-grade').value;
     config.scriptUrl = document.getElementById('dash-script-url').value.trim();
     config.timerSeconds = parseInt(document.getElementById('dash-timer').value) || 70;
     config.fontFamily = document.getElementById('dash-font').value;
@@ -818,9 +931,9 @@ function saveDashboard() {
     syncDashboardToConfig(); 
     localStorage.setItem('oralTestConfig', JSON.stringify(config));
     
-    // Apply changes instantly
+    // Apply changes instantly to Start Screen
     document.body.style.setProperty('--main-font', config.fontFamily);
-    document.getElementById('display-test-info').innerText = `${config.semester} | ${config.grade}`;
+    document.getElementById('display-test-info').innerText = `${config.activeSemester} | ${config.activeGrade}`;
     pool = []; 
     renderClassDropdown(); 
     document.getElementById('student-grid').innerHTML = ''; 
@@ -839,16 +952,20 @@ function importData(event) {
     reader.onload = function(e) {
         try {
             const imported = JSON.parse(e.target.result);
-            if(imported.cards) {
+            if(imported.tests || imported.cards) { // Basic Validation
                 config = imported;
+                
+                // Run silent migration if needed
+                if(config.cards && !config.tests) {
+                    config.tests = {};
+                    let fallbackKey = (config.semester || "First Semester") + "_" + (config.grade || "Grade 1");
+                    config.tests[fallbackKey] = config.cards;
+                    delete config.cards; 
+                }
+
                 document.body.style.setProperty('--main-font', config.fontFamily || "'Century Gothic', 'AppleGothic', sans-serif");
-                document.getElementById('dash-semester').value = config.semester || "First Semester";
-                document.getElementById('dash-grade').value = config.grade || "Grade 1";
-                document.getElementById('dash-script-url').value = config.scriptUrl || DEFAULT_URL;
-                document.getElementById('dash-timer').value = config.timerSeconds || 70;
-                document.getElementById('dash-font').value = config.fontFamily || "'Century Gothic', 'AppleGothic', sans-serif";
-                renderRosterEditor(); renderCardEditor();
-                alert("Import successful! Click 'Save Settings ✅' to apply.");
+                alert("Import successful! Opening Dashboard to verify data. Don't forget to click 'Save Settings ✅' to apply.");
+                openDashboard(); // Re-open dashboard with fresh imported data
             } else { alert("Invalid file format."); }
         } catch (err) { alert("Error reading file."); }
     };
