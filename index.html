@@ -75,12 +75,12 @@
     .screen h2 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 20px; text-align: center; color: var(--white); text-shadow: 2px 2px 0px rgba(0,0,0,0.2); }
     .test-info { font-size: 1.5rem; color: var(--secondary); margin-bottom: 30px; background: var(--primary); padding: 10px 30px; border-radius: 20px; box-shadow: 0 6px 0 var(--primary-dark); border: 3px solid white;}
 
-    .input-group { display: flex; flex-direction: row; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 800px; }
+    .input-group { display: flex; flex-direction: row; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 900px; }
 
     .game-input {
-        font-family: var(--main-font); font-weight: bold; font-size: 1.8rem; padding: 15px 20px; border: 5px solid var(--primary);
+        font-family: var(--main-font); font-weight: bold; font-size: 1.5rem; padding: 15px 20px; border: 5px solid var(--primary);
         border-radius: 20px; outline: none; text-align: center; background-color: var(--white); color: var(--text-dark);
-        box-shadow: 0 6px 0 rgba(0,0,0,0.1); flex: 1; min-width: 250px; cursor: pointer;
+        box-shadow: 0 6px 0 rgba(0,0,0,0.1); flex: 1; min-width: 200px; cursor: pointer;
     }
 
     /* Standard Game Buttons */
@@ -90,7 +90,7 @@
         box-shadow: 0 8px 0 var(--primary-dark); transition: transform 0.1s, box-shadow 0.1s; min-width: 220px; min-height: 70px; text-transform: uppercase;
     }
     .game-btn:active { transform: translateY(8px); box-shadow: 0 0 0 var(--primary-dark); }
-    .game-btn.start-btn { background-color: var(--primary); font-size: 2.5rem; padding: 20px 60px; }
+    .game-btn.start-btn { background-color: var(--primary); font-size: 2.5rem; padding: 20px 60px; margin-top: 20px;}
     .game-btn.alt-btn { background-color: var(--accent); color: white; box-shadow: 0 8px 0 var(--accent-dark); }
     .game-btn.alt-btn:active { box-shadow: 0 0 0 var(--accent-dark); }
     .game-btn.submit-btn { background-color: var(--correct); color: white; box-shadow: 0 8px 0 var(--correct-dark); }
@@ -100,8 +100,7 @@
 
     /* Clean Student Grid Elements */
     #student-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
         gap: 12px; margin-top: 20px; width: 100%; max-width: 1000px;
     }
     .student-btn {
@@ -111,9 +110,7 @@
         width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; 
     }
     .student-btn:active { transform: translateY(4px); box-shadow: 0 0 0 rgba(0,0,0,0.15); }
-    .student-btn.completed {
-        background-color: #ADB5BD; color: #495057; box-shadow: 0 4px 0 #868E96; text-decoration: line-through; opacity: 0.7;
-    }
+    .student-btn.completed { background-color: #ADB5BD; color: #495057; box-shadow: 0 4px 0 #868E96; text-decoration: line-through; opacity: 0.7; }
     .student-btn.completed:active { transform: translateY(4px); box-shadow: 0 0 0 #868E96; }
 
     /* Part 1 */
@@ -208,13 +205,12 @@
         <div class="test-info" id="display-test-info">First Semester | Grade 1</div>
         
         <div class="input-group">
-            <select id="start-semester" class="game-input" onchange="resetSelection()">
+            <select id="start-semester" class="game-input" onchange="updateActiveTest()">
                 <option value="First Semester">First Semester</option>
                 <option value="Second Semester">Second Semester</option>
             </select>
             
-            <!-- Dynamic Grades Dropdown -->
-            <select id="start-grade" class="game-input" onchange="renderClassDropdown()"></select>
+            <select id="start-grade" class="game-input" onchange="updateActiveTest()"></select>
             
             <select id="class-select" class="game-input" onchange="renderStudentGrid()">
                 <option value="">-- Select Class --</option>
@@ -278,25 +274,9 @@
             <!-- TAB 1: General Settings -->
             <div id="tab-general" class="dash-tab-content active">
                 <div style="background: rgba(0,0,0,0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                    <h2 style="margin-top:0; color:white;">Active Test Assignment</h2>
-                    <p style="color:#CAF0F8; margin-bottom:15px;">Which test are the students taking right now?</p>
-                    <div class="grid-2">
-                        <div>
-                            <label class="dash-label">Active Semester:</label>
-                            <select id="dash-active-semester" class="dash-input">
-                                <option value="First Semester">First Semester</option>
-                                <option value="Second Semester">Second Semester</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="dash-label">Active Grade Level:</label>
-                            <!-- Dynamic Grades Dropdown -->
-                            <select id="dash-active-grade" class="dash-input"></select>
-                        </div>
-                    </div>
-                    
-                    <hr>
                     <h2 style="margin-top:0; color:white;">Global Settings</h2>
+                    <p style="color:#CAF0F8; margin-bottom:15px;">Note: The active Semester and Grade are chosen directly on the Start Screen.</p>
+                    
                     <div class="grid-2" style="margin-top: 10px;">
                         <div>
                             <label class="dash-label">Timer Duration (Seconds):</label>
@@ -476,7 +456,7 @@ const defaultConfig = {
     scriptUrl: DEFAULT_URL, 
     timerSeconds: 70, 
     fontFamily: "'Century Gothic', 'AppleGothic', sans-serif",
-    grades: ["Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5", "Grade 6"], // Dynamic Grades
+    grades: ["Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5", "Grade 6"],
     roster: [
         { grade: "Grade 1", className: "1A", students: ["John Doe", "Jane Smith", "Emily Chen", "Michael Wu"] },
         { grade: "Grade 3", className: "3B", students: ["Peter Parker", "Bruce Wayne"] }
@@ -495,7 +475,7 @@ const defaultConfig = {
 
 let config = JSON.parse(localStorage.getItem('oralTestConfig')) || defaultConfig;
 
-// Data Migration Script to support old formats & dynamic grades
+// Data Migration Script
 if(config.cards && !config.tests) {
     config.tests = {};
     let fallbackKey = (config.semester || "First Semester") + "_" + (config.grade || "Grade 1");
@@ -504,7 +484,6 @@ if(config.cards && !config.tests) {
 }
 if(!config.grades) {
     config.grades = ["Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5", "Grade 6"];
-    // Catch any legacy custom grades
     if(config.roster) { config.roster.forEach(r => { if(r.grade && !config.grades.includes(r.grade)) config.grades.push(r.grade); }); }
 }
 if(config.roster) { config.roster.forEach(r => { if(!r.grade) r.grade = "Grade 1"; }); }
@@ -517,22 +496,24 @@ let activeRosterGrade = config.grades.length > 0 ? config.grades[0] : "";
 
 // Initialize App
 document.body.style.setProperty('--main-font', config.fontFamily || "'Century Gothic', 'AppleGothic', sans-serif");
-document.getElementById('display-test-info').innerText = `${config.activeSemester} | ${config.activeGrade}`;
+document.getElementById('start-semester').value = config.activeSemester || "First Semester";
 updateGlobalGradeDropdowns();
-document.getElementById('start-semester').value = config.activeSemester;
+document.getElementById('display-test-info').innerText = `${config.activeSemester} | ${config.activeGrade}`;
 
-// Triggers when Semester changes to reset flow
-function resetSelection() {
+function updateActiveTest() {
+    config.activeSemester = document.getElementById('start-semester').value;
+    config.activeGrade = document.getElementById('start-grade').value;
+    document.getElementById('display-test-info').innerText = `${config.activeSemester} | ${config.activeGrade}`;
+    localStorage.setItem('oralTestConfig', JSON.stringify(config));
     renderClassDropdown();
 }
 
-// Global Grade Dropdown Population
 function updateGlobalGradeDropdowns() {
-    const selects = ['start-grade', 'dash-active-grade', 'editor-grade'];
+    const selects = ['start-grade', 'editor-grade'];
     selects.forEach(id => {
         const el = document.getElementById(id);
         if(el) {
-            let currentVal = el.value || config.activeGrade; // Attempt to preserve value
+            let currentVal = el.value || config.activeGrade; 
             el.innerHTML = '';
             if(config.grades && config.grades.length > 0) {
                 config.grades.forEach(g => {
@@ -547,17 +528,14 @@ function updateGlobalGradeDropdowns() {
             }
         }
     });
-    
-    // Once dropdowns are updated, render the classes for the start screen
     renderClassDropdown();
 }
 
-// ALPHANUMERIC SORTING & GRADE FILTERING
 function renderClassDropdown() {
     const gradeVal = document.getElementById('start-grade').value;
     const classSel = document.getElementById('class-select');
     classSel.innerHTML = '<option value="">-- Select Class --</option>';
-    document.getElementById('student-grid').innerHTML = ''; // Clear students until a class is selected
+    document.getElementById('student-grid').innerHTML = ''; 
     
     if(config.roster && config.roster.length > 0 && gradeVal) {
         let filteredRoster = config.roster.filter(r => r.grade === gradeVal);
@@ -750,30 +728,25 @@ function submitToDrive() {
 function resetGame() { playClick(); switchScreen('start-screen'); renderStudentGrid(); }
 
 // ==========================================
-// TEACHER DASHBOARD GUI (TABBED + LOCKABLE CARDS)
+// TEACHER DASHBOARD GUI (TABBED)
 // ==========================================
+
 function populateEditorDropdowns() {
     const semSel = document.getElementById('editor-semester');
     semSel.innerHTML = '';
     SEMESTERS.forEach(s => { let o = document.createElement('option'); o.value = s; o.innerText = s; semSel.appendChild(o); });
-    // editor-grade is populated by updateGlobalGradeDropdowns
 }
 
 function openDashboard() {
     playSelect(); document.getElementById('dashboard-modal').style.display = 'block';
     
-    document.getElementById('dash-active-semester').value = config.activeSemester;
-    updateGlobalGradeDropdowns();
-    document.getElementById('dash-active-grade').value = config.activeGrade;
     document.getElementById('dash-script-url').value = config.scriptUrl;
     document.getElementById('dash-timer').value = config.timerSeconds;
     document.getElementById('dash-font').value = config.fontFamily;
     
-    // Ensure roster active grade is valid
     if(!activeRosterGrade && config.grades && config.grades.length > 0) activeRosterGrade = config.grades[0];
     
     renderRosterEditor(); 
-    
     populateEditorDropdowns();
     document.getElementById('editor-semester').value = config.activeSemester;
     document.getElementById('editor-grade').value = config.activeGrade;
@@ -796,7 +769,6 @@ function openDashTab(tabId) {
 }
 
 function syncDashboardToConfig() {
-    // 1. Sync Active Roster Tab
     if(activeRosterGrade) {
         let updatedClassesForGrade = [];
         document.querySelectorAll('.roster-card').forEach(rc => {
@@ -804,13 +776,9 @@ function syncDashboardToConfig() {
             let sList = rc.querySelector('.r-students').value.split('\n').map(s => s.trim()).filter(s => s !== "");
             if(cName) updatedClassesForGrade.push({ grade: activeRosterGrade, className: cName, students: sList });
         });
-        // Remove old classes for this grade
         config.roster = config.roster.filter(r => r.grade !== activeRosterGrade);
-        // Inject updated classes
         config.roster.push(...updatedClassesForGrade);
     }
-
-    // 2. Sync Editor Cards to current target key
     syncCardsToConfig(currentEditingKey);
 }
 
@@ -869,7 +837,6 @@ function deleteCurrentGrade() {
         config.grades = config.grades.filter(g => g !== activeRosterGrade);
         config.roster = config.roster.filter(r => r.grade !== activeRosterGrade);
         
-        // Remove associated test banks
         for(let key in config.tests) {
             if(key.endsWith("_" + activeRosterGrade)) delete config.tests[key];
         }
@@ -881,21 +848,16 @@ function deleteCurrentGrade() {
 }
 
 function switchRosterGrade(grade) {
-    playClick();
-    syncDashboardToConfig();
-    activeRosterGrade = grade;
-    renderRosterEditor();
+    playClick(); syncDashboardToConfig(); activeRosterGrade = grade; renderRosterEditor();
 }
 
 function renderRosterEditor() {
     const tabsContainer = document.getElementById('roster-tabs-container');
     const container = document.getElementById('roster-container');
-    tabsContainer.innerHTML = '';
-    container.innerHTML = '';
+    tabsContainer.innerHTML = ''; container.innerHTML = '';
 
     if(!config.grades || config.grades.length === 0) return;
 
-    // Render Grade Sub-tabs
     config.grades.forEach(g => {
         let btn = document.createElement('button');
         btn.className = 'roster-tab' + (g === activeRosterGrade ? ' active' : '');
@@ -1037,8 +999,6 @@ function deleteCard(idx) {
 
 function saveDashboard() {
     playClick();
-    config.activeSemester = document.getElementById('dash-active-semester').value;
-    config.activeGrade = document.getElementById('dash-active-grade').value;
     config.scriptUrl = document.getElementById('dash-script-url').value.trim();
     config.timerSeconds = parseInt(document.getElementById('dash-timer').value) || 70;
     config.fontFamily = document.getElementById('dash-font').value;
@@ -1047,15 +1007,12 @@ function saveDashboard() {
     localStorage.setItem('oralTestConfig', JSON.stringify(config));
     
     document.body.style.setProperty('--main-font', config.fontFamily);
-    document.getElementById('display-test-info').innerText = `${config.activeSemester} | ${config.activeGrade}`;
     
-    // Ensure start screen gets updated
-    document.getElementById('start-semester').value = config.activeSemester;
-    document.getElementById('start-grade').value = config.activeGrade;
-
-    pool = []; 
+    // Ensure homepage matches what was set, triggering a class render
+    updateGlobalGradeDropdowns();
     renderClassDropdown(); 
-    document.getElementById('student-grid').innerHTML = ''; 
+    
+    pool = []; 
     alert("Settings saved successfully!"); closeDashboard();
 }
 
