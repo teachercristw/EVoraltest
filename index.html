@@ -168,7 +168,10 @@
         border: 1px solid #023E8A; background: #CAF0F8; color: #023E8A; box-sizing: border-box; font-weight: bold;
     }
     .dash-input:focus { outline: 2px solid var(--primary); }
-    .q-card, .roster-card { background: #0096C7; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 8px solid var(--primary); }
+    
+    .q-card, .roster-card { background: #0096C7; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 8px solid var(--primary); transition: all 0.3s ease; }
+    .q-card.locked { background: #023E8A; border-left: 8px solid var(--correct); opacity: 0.9; }
+
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
     .dash-btn { padding: 10px 20px; font-size: 1rem; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; margin: 5px 5px 5px 0; }
     .dash-btn.save { background: var(--correct); color: white; }
@@ -332,7 +335,6 @@
 
             <!-- TAB 3: Test Cards -->
             <div id="tab-cards" class="dash-tab-content">
-                
                 <div style="background: rgba(0,0,0,0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 2px solid var(--accent);">
                     <h2 style="margin-top:0; color:white;">Select Test Bank to Edit</h2>
                     <p style="color:#CAF0F8;">You are currently editing the cards for:</p>
@@ -343,8 +345,10 @@
                 </div>
 
                 <div style="margin-bottom: 20px;">
+                    <!-- New cards will be added to the TOP -->
                     <button class="dash-btn action" onclick="addQuestionCard()">➕ Add New Test Card</button>
                 </div>
+                
                 <div id="editor-container"></div>
             </div>
 
@@ -460,11 +464,9 @@ const playWarning = () => { initAudio(); playTone(300, 'sawtooth', 0.3); }
 // --- Game Data & Configuration ---
 const DEFAULT_URL = "https://script.google.com/macros/s/AKfycbwe8u9jinO3KHPTvQy_y1pW8gMeIg9Yk6Qv4ReuC92GFBFJkBw14ZiXfnlWMO6t_rUo/exec";
 
-// Constants for Dropdowns
 const SEMESTERS = ["First Semester", "Second Semester"];
 const GRADES = ["Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5", "Grade 6"];
 
-// Default Config Structure
 const defaultConfig = {
     activeSemester: "First Semester", 
     activeGrade: "Grade 1", 
@@ -480,7 +482,8 @@ const defaultConfig = {
             {
                 p1Mode: "auto", sentence: "The quick brown fox jumps over the lazy dog.", manualWords: [], 
                 q1: "What animal jumped?", q1opts: ["A dog", "A fox", "A cat", "A rabbit"], q1ans: 1, q1pts: 5,
-                q2: "What color was the fox?", q2opts: ["Red", "Brown", "Black", "White"], q2ans: 1, q2pts: 5
+                q2: "What color was the fox?", q2opts: ["Red", "Brown", "Black", "White"], q2ans: 1, q2pts: 5,
+                locked: false
             }
         ]
     }
@@ -494,9 +497,15 @@ if(config.cards && !config.tests) {
     let fallbackKey = (config.semester || "First Semester") + "_" + (config.grade || "Grade 1");
     config.tests[fallbackKey] = config.cards;
     delete config.cards; 
-    
     if(!config.activeSemester) config.activeSemester = config.semester || "First Semester";
     if(!config.activeGrade) config.activeGrade = config.grade || "Grade 1";
+}
+
+// Add 'locked' property retroactively to any old cards missing it
+for(let key in config.tests) {
+    config.tests[key].forEach(card => {
+        if(card.locked === undefined) card.locked = true; 
+    });
 }
 
 let pool = [];
@@ -512,11 +521,9 @@ function renderClassDropdown() {
     const classSel = document.getElementById('class-select');
     classSel.innerHTML = '<option value="">-- Select Class --</option>';
     if(config.roster && config.roster.length > 0) {
-        // ALPHANUMERIC SORTING
         let sortedRoster = [...config.roster].sort((a, b) => {
             return a.className.localeCompare(b.className, undefined, { numeric: true, sensitivity: 'base' });
         });
-
         sortedRoster.forEach(r => {
             let opt = document.createElement('option');
             opt.value = r.className; opt.innerText = r.className;
@@ -694,7 +701,7 @@ function submitToDrive() {
 function resetGame() { playClick(); switchScreen('start-screen'); renderStudentGrid(); }
 
 // ==========================================
-// TEACHER DASHBOARD GUI (TABBED + SCOPED CARDS)
+// TEACHER DASHBOARD GUI (TABBED + LOCKABLE CARDS)
 // ==========================================
 
 function populateEditorDropdowns() {
@@ -738,6 +745,7 @@ function openDashTab(tabId) {
     event.currentTarget.classList.add('active');
 }
 
+// SECURE DATA SYNCING: Handles both locked and unlocked card states
 function syncDashboardToConfig() {
     let newRoster = [];
     document.querySelectorAll('.roster-card').forEach(rc => {
@@ -752,18 +760,44 @@ function syncDashboardToConfig() {
 function syncCardsToConfig(key) {
     if(!key) return;
     let newCards = [];
-    document.querySelectorAll('#editor-container .q-card').forEach(cardDom => {
-        let p1Mode = cardDom.querySelector('.c-p1mode').value;
-        let manualWords = [];
-        cardDom.querySelectorAll('.manual-word-row').forEach(row => {
-            let w = row.querySelector('.c-mw-word').value.trim(); let p = row.querySelector('.c-mw-pts').value;
-            if(w) manualWords.push({ word: w, pts: p });
-        });
-        newCards.push({
-            p1Mode: p1Mode, sentence: cardDom.querySelector('.c-sent').value, manualWords: manualWords,
-            q1: cardDom.querySelector('.c-q1').value, q1opts: [cardDom.querySelector('.c-q1o0').value, cardDom.querySelector('.c-q1o1').value, cardDom.querySelector('.c-q1o2').value, cardDom.querySelector('.c-q1o3').value], q1ans: parseInt(cardDom.querySelector('.c-q1ans').value), q1pts: parseInt(cardDom.querySelector('.c-q1pts').value) || 0,
-            q2: cardDom.querySelector('.c-q2').value, q2opts: [cardDom.querySelector('.c-q2o0').value, cardDom.querySelector('.c-q2o1').value, cardDom.querySelector('.c-q2o2').value, cardDom.querySelector('.c-q2o3').value], q2ans: parseInt(cardDom.querySelector('.c-q2ans').value), q2pts: parseInt(cardDom.querySelector('.c-q2pts').value) || 0
-        });
+    let currentCardsMem = config.tests[key] || [];
+
+    document.querySelectorAll('#editor-container .q-card').forEach((cardDom, i) => {
+        let isLocked = cardDom.dataset.locked === "true";
+        
+        if(isLocked) {
+            // Card is collapsed, so it has no input elements. Pull from memory securely.
+            newCards.push(currentCardsMem[i]);
+        } else {
+            // Card is expanded, scrape the input elements.
+            let p1Mode = cardDom.querySelector('.c-p1mode').value;
+            let manualWords = [];
+            cardDom.querySelectorAll('.manual-word-row').forEach(row => {
+                let w = row.querySelector('.c-mw-word').value.trim(); 
+                let p = row.querySelector('.c-mw-pts').value;
+                if(w) manualWords.push({ word: w, pts: p });
+            });
+            newCards.push({
+                p1Mode: p1Mode, 
+                sentence: cardDom.querySelector('.c-sent')?.value || "", 
+                manualWords: manualWords,
+                q1: cardDom.querySelector('.c-q1').value, 
+                q1opts: [
+                    cardDom.querySelector('.c-q1o0').value, cardDom.querySelector('.c-q1o1').value, 
+                    cardDom.querySelector('.c-q1o2').value, cardDom.querySelector('.c-q1o3').value
+                ], 
+                q1ans: parseInt(cardDom.querySelector('.c-q1ans').value), 
+                q1pts: parseInt(cardDom.querySelector('.c-q1pts').value) || 0,
+                q2: cardDom.querySelector('.c-q2').value, 
+                q2opts: [
+                    cardDom.querySelector('.c-q2o0').value, cardDom.querySelector('.c-q2o1').value, 
+                    cardDom.querySelector('.c-q2o2').value, cardDom.querySelector('.c-q2o3').value
+                ], 
+                q2ans: parseInt(cardDom.querySelector('.c-q2ans').value), 
+                q2pts: parseInt(cardDom.querySelector('.c-q2pts').value) || 0,
+                locked: false // We are actively editing it
+            });
+        }
     });
     
     if(!config.tests) config.tests = {};
@@ -790,17 +824,14 @@ function addRosterCard() { syncDashboardToConfig(); config.roster.push({ classNa
 function changeEditTarget() {
     playClick();
     syncCardsToConfig(currentEditingKey); 
-    
     let sem = document.getElementById('editor-semester').value;
     let grd = document.getElementById('editor-grade').value;
     currentEditingKey = sem + "_" + grd;
-    
     renderCardEditor(); 
 }
 
 function renderCardEditor() {
     const container = document.getElementById('editor-container'); container.innerHTML = '';
-    
     let targetCards = config.tests && config.tests[currentEditingKey] ? config.tests[currentEditingKey] : [];
 
     if(targetCards.length === 0) {
@@ -809,75 +840,109 @@ function renderCardEditor() {
     }
 
     targetCards.forEach((card, index) => {
-        const div = document.createElement('div'); div.className = 'q-card';
-        let manualWordsHTML = '';
-        if(card.manualWords) {
-            card.manualWords.forEach(mw => {
-                manualWordsHTML += `
-                <div class="manual-word-row" style="display:flex; gap:10px; margin-bottom:5px;">
-                    <input type="text" class="dash-input c-mw-word" value="${mw.word}" placeholder="Word" style="flex:2; margin:0;">
-                    <input type="number" class="dash-input c-mw-pts" value="${mw.pts}" placeholder="Pts" style="flex:1; margin:0;">
-                    <button class="dash-btn danger small" onclick="this.parentElement.remove()" style="margin:0;">X</button>
-                </div>`;
-            });
+        const div = document.createElement('div'); 
+        div.className = 'q-card';
+        
+        // If card is locked, show collapsed view
+        if(card.locked) {
+            div.dataset.locked = "true";
+            div.classList.add('locked');
+            div.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3 style="color:white; margin:0;">Card ${targetCards.length - index}</h3>
+                    <div>
+                        <button class="dash-btn action small" style="margin:0 5px 0 0;" onclick="toggleCardLock(${index})">✏️ Edit</button>
+                        <button class="dash-btn danger small" style="margin:0;" onclick="deleteCard(${index})">🗑️</button>
+                    </div>
+                </div>
+                <p style="color:#CAF0F8; margin: 10px 0 0 0; font-style:italic;">"${card.sentence ? card.sentence.substring(0,50) + '...' : '(No sentence text)'}"</p>
+            `;
+        } 
+        // If card is unlocked, show full editor
+        else {
+            div.dataset.locked = "false";
+            div.classList.remove('locked');
+            
+            let manualWordsHTML = '';
+            if(card.manualWords) {
+                card.manualWords.forEach(mw => {
+                    manualWordsHTML += `
+                    <div class="manual-word-row" style="display:flex; gap:10px; margin-bottom:5px;">
+                        <input type="text" class="dash-input c-mw-word" value="${mw.word}" placeholder="Word" style="flex:2; margin:0;">
+                        <input type="number" class="dash-input c-mw-pts" value="${mw.pts}" placeholder="Pts" style="flex:1; margin:0;">
+                        <button class="dash-btn danger small" onclick="this.parentElement.remove()" style="margin:0;">X</button>
+                    </div>`;
+                });
+            }
+            div.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h2 style="color:white; margin:0;">Card ${targetCards.length - index} (Editing)</h2>
+                    <button class="dash-btn danger small" style="margin:0;" onclick="deleteCard(${index})">🗑️ Delete</button>
+                </div>
+                <label class="dash-label">Part 1 Scoring Mode</label>
+                <select class="dash-input c-p1mode" onchange="toggleModeUI(this)">
+                    <option value="auto" ${card.p1Mode === 'auto' ? 'selected' : ''}>Automatic (20 pts divided evenly)</option>
+                    <option value="manual" ${card.p1Mode === 'manual' ? 'selected' : ''}>Manual (Add specific words & points)</option>
+                </select>
+                <div class="ui-auto" style="display: ${card.p1Mode === 'auto' ? 'block' : 'none'};">
+                    <label class="dash-label">Sentence</label>
+                    <input type="text" class="dash-input c-sent" value="${card.sentence}" placeholder="e.g. The quick brown fox...">
+                </div>
+                <div class="ui-manual" style="display: ${card.p1Mode === 'manual' ? 'block' : 'none'}; background:rgba(0,0,0,0.2); padding:10px; border-radius:5px;">
+                    <label class="dash-label">Words & Points List</label>
+                    <div class="mw-container">${manualWordsHTML}</div>
+                    <button class="dash-btn action small" style="margin-top:10px;" onclick="addManualWordRow(this)">➕ Add Word</button>
+                </div>
+                <hr>
+                <div class="grid-2">
+                    <div>
+                        <label class="dash-label">Q1 Text</label><input type="text" class="dash-input c-q1" value="${card.q1}">
+                        <label class="dash-label">Options</label>
+                        <input type="text" class="dash-input c-q1o0" value="${card.q1opts[0] || ''}">
+                        <input type="text" class="dash-input c-q1o1" value="${card.q1opts[1] || ''}">
+                        <input type="text" class="dash-input c-q1o2" value="${card.q1opts[2] || ''}">
+                        <input type="text" class="dash-input c-q1o3" value="${card.q1opts[3] || ''}">
+                        <div style="display:flex; gap:10px;">
+                            <select class="dash-input c-q1ans" style="flex:2;">
+                                <option value="0" ${card.q1ans == 0 ? 'selected' : ''}>Correct: Option 1</option>
+                                <option value="1" ${card.q1ans == 1 ? 'selected' : ''}>Correct: Option 2</option>
+                                <option value="2" ${card.q1ans == 2 ? 'selected' : ''}>Correct: Option 3</option>
+                                <option value="3" ${card.q1ans == 3 ? 'selected' : ''}>Correct: Option 4</option>
+                            </select>
+                            <input type="number" class="dash-input c-q1pts" value="${card.q1pts}" placeholder="Pts" style="flex:1;">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="dash-label">Q2 Text</label><input type="text" class="dash-input c-q2" value="${card.q2}">
+                        <label class="dash-label">Options</label>
+                        <input type="text" class="dash-input c-q2o0" value="${card.q2opts[0] || ''}">
+                        <input type="text" class="dash-input c-q2o1" value="${card.q2opts[1] || ''}">
+                        <input type="text" class="dash-input c-q2o2" value="${card.q2opts[2] || ''}">
+                        <input type="text" class="dash-input c-q2o3" value="${card.q2opts[3] || ''}">
+                        <div style="display:flex; gap:10px;">
+                            <select class="dash-input c-q2ans" style="flex:2;">
+                                <option value="0" ${card.q2ans == 0 ? 'selected' : ''}>Correct: Option 1</option>
+                                <option value="1" ${card.q2ans == 1 ? 'selected' : ''}>Correct: Option 2</option>
+                                <option value="2" ${card.q2ans == 2 ? 'selected' : ''}>Correct: Option 3</option>
+                                <option value="3" ${card.q2ans == 3 ? 'selected' : ''}>Correct: Option 4</option>
+                            </select>
+                            <input type="number" class="dash-input c-q2pts" value="${card.q2pts}" placeholder="Pts" style="flex:1;">
+                        </div>
+                    </div>
+                </div>
+                <button class="dash-btn save" style="width:100%; margin-top:20px; font-size:1.3rem; padding:15px;" onclick="toggleCardLock(${index})">🔒 Save & Lock Card</button>
+            `;
         }
-        div.innerHTML = `
-            <h2 style="color:white;">Card ${index + 1}</h2>
-            <label class="dash-label">Part 1 Scoring Mode</label>
-            <select class="dash-input c-p1mode" onchange="toggleModeUI(this)">
-                <option value="auto" ${card.p1Mode === 'auto' ? 'selected' : ''}>Automatic (20 pts divided evenly)</option>
-                <option value="manual" ${card.p1Mode === 'manual' ? 'selected' : ''}>Manual (Add specific words & points)</option>
-            </select>
-            <div class="ui-auto" style="display: ${card.p1Mode === 'auto' ? 'block' : 'none'};">
-                <label class="dash-label">Sentence</label>
-                <input type="text" class="dash-input c-sent" value="${card.sentence}" placeholder="e.g. The quick brown fox...">
-            </div>
-            <div class="ui-manual" style="display: ${card.p1Mode === 'manual' ? 'block' : 'none'}; background:rgba(0,0,0,0.2); padding:10px; border-radius:5px;">
-                <label class="dash-label">Words & Points List</label>
-                <div class="mw-container">${manualWordsHTML}</div>
-                <button class="dash-btn action small" style="margin-top:10px;" onclick="addManualWordRow(this)">➕ Add Word</button>
-            </div>
-            <hr>
-            <div class="grid-2">
-                <div>
-                    <label class="dash-label">Q1 Text</label><input type="text" class="dash-input c-q1" value="${card.q1}">
-                    <label class="dash-label">Options</label>
-                    <input type="text" class="dash-input c-q1o0" value="${card.q1opts[0] || ''}">
-                    <input type="text" class="dash-input c-q1o1" value="${card.q1opts[1] || ''}">
-                    <input type="text" class="dash-input c-q1o2" value="${card.q1opts[2] || ''}">
-                    <input type="text" class="dash-input c-q1o3" value="${card.q1opts[3] || ''}">
-                    <div style="display:flex; gap:10px;">
-                        <select class="dash-input c-q1ans" style="flex:2;">
-                            <option value="0" ${card.q1ans == 0 ? 'selected' : ''}>Correct: Option 1</option>
-                            <option value="1" ${card.q1ans == 1 ? 'selected' : ''}>Correct: Option 2</option>
-                            <option value="2" ${card.q1ans == 2 ? 'selected' : ''}>Correct: Option 3</option>
-                            <option value="3" ${card.q1ans == 3 ? 'selected' : ''}>Correct: Option 4</option>
-                        </select>
-                        <input type="number" class="dash-input c-q1pts" value="${card.q1pts}" placeholder="Pts" style="flex:1;">
-                    </div>
-                </div>
-                <div>
-                    <label class="dash-label">Q2 Text</label><input type="text" class="dash-input c-q2" value="${card.q2}">
-                    <label class="dash-label">Options</label>
-                    <input type="text" class="dash-input c-q2o0" value="${card.q2opts[0] || ''}">
-                    <input type="text" class="dash-input c-q2o1" value="${card.q2opts[1] || ''}">
-                    <input type="text" class="dash-input c-q2o2" value="${card.q2opts[2] || ''}">
-                    <input type="text" class="dash-input c-q2o3" value="${card.q2opts[3] || ''}">
-                    <div style="display:flex; gap:10px;">
-                        <select class="dash-input c-q2ans" style="flex:2;">
-                            <option value="0" ${card.q2ans == 0 ? 'selected' : ''}>Correct: Option 1</option>
-                            <option value="1" ${card.q2ans == 1 ? 'selected' : ''}>Correct: Option 2</option>
-                            <option value="2" ${card.q2ans == 2 ? 'selected' : ''}>Correct: Option 3</option>
-                            <option value="3" ${card.q2ans == 3 ? 'selected' : ''}>Correct: Option 4</option>
-                        </select>
-                        <input type="number" class="dash-input c-q2pts" value="${card.q2pts}" placeholder="Pts" style="flex:1;">
-                    </div>
-                </div>
-            </div>
-            <button class="dash-btn danger" style="margin-top:15px;" onclick="deleteCard(${index})">🗑️ Delete Card</button>
-        `;
         container.appendChild(div);
     });
+}
+
+function toggleCardLock(index) {
+    playClick();
+    syncCardsToConfig(currentEditingKey); // Capture any typed data before re-rendering
+    let targetCards = config.tests[currentEditingKey];
+    targetCards[index].locked = !targetCards[index].locked; // Toggle boolean
+    renderCardEditor();
 }
 
 function toggleModeUI(selectElem) {
@@ -894,14 +959,22 @@ function addManualWordRow(btnElem) {
 }
 
 function addQuestionCard() { 
+    playClick();
     syncCardsToConfig(currentEditingKey); 
     if(!config.tests[currentEditingKey]) config.tests[currentEditingKey] = [];
-    config.tests[currentEditingKey].push({ p1Mode: "auto", sentence: "", manualWords: [], q1: "", q1opts: ["", "", "", ""], q1ans: 0, q1pts: 5, q2: "", q2opts: ["", "", "", ""], q2ans: 0, q2pts: 5 }); 
+    
+    // UNSHIFT adds the new card to the TOP of the array
+    config.tests[currentEditingKey].unshift({ 
+        p1Mode: "auto", sentence: "", manualWords: [], 
+        q1: "", q1opts: ["", "", "", ""], q1ans: 0, q1pts: 5, 
+        q2: "", q2opts: ["", "", "", ""], q2ans: 0, q2pts: 5,
+        locked: false // Unlocked by default so teacher can edit it immediately
+    }); 
     renderCardEditor(); 
 }
 
 function deleteCard(idx) { 
-    if(confirm("Delete this card?")) { 
+    if(confirm("Delete this card permanently?")) { 
         syncCardsToConfig(currentEditingKey); 
         config.tests[currentEditingKey].splice(idx, 1); 
         renderCardEditor(); 
@@ -919,6 +992,7 @@ function saveDashboard() {
     syncDashboardToConfig(); 
     localStorage.setItem('oralTestConfig', JSON.stringify(config));
     
+    // Apply changes instantly
     document.body.style.setProperty('--main-font', config.fontFamily);
     document.getElementById('display-test-info').innerText = `${config.activeSemester} | ${config.activeGrade}`;
     pool = []; 
