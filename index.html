@@ -73,13 +73,14 @@
     .school-title { font-size: clamp(1.5rem, 3vw, 2.5rem); color: var(--primary); text-shadow: 2px 2px 0px var(--secondary-dark); margin-bottom: 0; text-transform: uppercase; letter-spacing: 2px;}
     .main-title { font-size: clamp(3.5rem, 7vw, 5rem); text-align: center; color: var(--white); margin-top: 5px; margin-bottom: 20px; text-shadow: 4px 4px 0px var(--secondary-dark); }
     .screen h2 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 20px; text-align: center; color: var(--white); text-shadow: 2px 2px 0px rgba(0,0,0,0.2); }
-    
-    .input-group { display: flex; flex-direction: row; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 900px; }
+    .test-info { font-size: 1.5rem; color: var(--secondary); margin-bottom: 30px; background: var(--primary); padding: 10px 30px; border-radius: 20px; box-shadow: 0 6px 0 var(--primary-dark); border: 3px solid white;}
+
+    .input-group { display: flex; flex-direction: row; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 800px; }
 
     .game-input {
-        font-family: var(--main-font); font-weight: bold; font-size: 1.5rem; padding: 15px 20px; border: 5px solid var(--primary);
+        font-family: var(--main-font); font-weight: bold; font-size: 1.8rem; padding: 15px 20px; border: 5px solid var(--primary);
         border-radius: 20px; outline: none; text-align: center; background-color: var(--white); color: var(--text-dark);
-        box-shadow: 0 6px 0 rgba(0,0,0,0.1); flex: 1; min-width: 200px; cursor: pointer;
+        box-shadow: 0 6px 0 rgba(0,0,0,0.1); flex: 1; min-width: 250px; cursor: pointer;
     }
 
     /* Standard Game Buttons */
@@ -89,7 +90,7 @@
         box-shadow: 0 8px 0 var(--primary-dark); transition: transform 0.1s, box-shadow 0.1s; min-width: 220px; min-height: 70px; text-transform: uppercase;
     }
     .game-btn:active { transform: translateY(8px); box-shadow: 0 0 0 var(--primary-dark); }
-    .game-btn.start-btn { background-color: var(--primary); font-size: 2.5rem; padding: 20px 60px; margin-top: 20px;}
+    .game-btn.start-btn { background-color: var(--primary); font-size: 2.5rem; padding: 20px 60px; }
     .game-btn.alt-btn { background-color: var(--accent); color: white; box-shadow: 0 8px 0 var(--accent-dark); }
     .game-btn.alt-btn:active { box-shadow: 0 0 0 var(--accent-dark); }
     .game-btn.submit-btn { background-color: var(--correct); color: white; box-shadow: 0 8px 0 var(--correct-dark); }
@@ -99,7 +100,8 @@
 
     /* Clean Student Grid Elements */
     #student-grid {
-        display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
         gap: 12px; margin-top: 20px; width: 100%; max-width: 1000px;
     }
     .student-btn {
@@ -109,7 +111,9 @@
         width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; 
     }
     .student-btn:active { transform: translateY(4px); box-shadow: 0 0 0 rgba(0,0,0,0.15); }
-    .student-btn.completed { background-color: #ADB5BD; color: #495057; box-shadow: 0 4px 0 #868E96; text-decoration: line-through; opacity: 0.7; }
+    .student-btn.completed {
+        background-color: #ADB5BD; color: #495057; box-shadow: 0 4px 0 #868E96; text-decoration: line-through; opacity: 0.7;
+    }
     .student-btn.completed:active { transform: translateY(4px); box-shadow: 0 0 0 #868E96; }
 
     /* Part 1 */
@@ -172,8 +176,14 @@
     .dash-tab-btn.active { background: var(--primary); color: var(--secondary-dark); }
     .dash-tab-content { display: none; }
     .dash-tab-content.active { display: block; animation: fadeIn 0.3s ease; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
+    /* Sub-Tabs for Grade Rosters */
+    .roster-tabs { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 15px; }
+    .roster-tab { background: rgba(0,0,0,0.2); border:none; padding: 10px 15px; color: white; cursor: pointer; border-radius: 5px; font-weight: bold;}
+    .roster-tab:hover { background: rgba(0,0,0,0.4); }
+    .roster-tab.active { background: var(--primary); color: var(--secondary-dark); }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     .help-list li { margin-bottom: 15px; font-size: 1.1rem; line-height: 1.5; }
     .help-code { width: 100%; height: 300px; font-family: monospace; font-size: 0.9rem; background: #1A202C; color: #A0AEC0; padding: 15px; border-radius: 5px; border: 1px solid #4A5568; white-space: pre; }
 </style>
@@ -191,24 +201,21 @@
 
     <div id="top-bar"><div id="timer-display">01:10</div></div>
 
-    <!-- Start Screen (Now contains the active assignments) -->
+    <!-- Start Screen -->
     <div id="start-screen" class="screen active">
         <h1 class="school-title">Sanxing English Village</h1>
         <h1 class="main-title">Oral English Test</h1>
+        <div class="test-info" id="display-test-info">First Semester | Grade 1</div>
         
         <div class="input-group">
             <select id="start-semester" class="game-input" onchange="resetSelection()">
                 <option value="First Semester">First Semester</option>
                 <option value="Second Semester">Second Semester</option>
             </select>
-            <select id="start-grade" class="game-input" onchange="renderClassDropdown()">
-                <option value="Grade 1">Grade 1</option>
-                <option value="Grade 2">Grade 2</option>
-                <option value="Grade 3">Grade 3</option>
-                <option value="Grade 4">Grade 4</option>
-                <option value="Grade 5">Grade 5</option>
-                <option value="Grade 6">Grade 6</option>
-            </select>
+            
+            <!-- Dynamic Grades Dropdown -->
+            <select id="start-grade" class="game-input" onchange="renderClassDropdown()"></select>
+            
             <select id="class-select" class="game-input" onchange="renderStudentGrid()">
                 <option value="">-- Select Class --</option>
             </select>
@@ -271,6 +278,24 @@
             <!-- TAB 1: General Settings -->
             <div id="tab-general" class="dash-tab-content active">
                 <div style="background: rgba(0,0,0,0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <h2 style="margin-top:0; color:white;">Active Test Assignment</h2>
+                    <p style="color:#CAF0F8; margin-bottom:15px;">Which test are the students taking right now?</p>
+                    <div class="grid-2">
+                        <div>
+                            <label class="dash-label">Active Semester:</label>
+                            <select id="dash-active-semester" class="dash-input">
+                                <option value="First Semester">First Semester</option>
+                                <option value="Second Semester">Second Semester</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="dash-label">Active Grade Level:</label>
+                            <!-- Dynamic Grades Dropdown -->
+                            <select id="dash-active-grade" class="dash-input"></select>
+                        </div>
+                    </div>
+                    
+                    <hr>
                     <h2 style="margin-top:0; color:white;">Global Settings</h2>
                     <div class="grid-2" style="margin-top: 10px;">
                         <div>
@@ -288,6 +313,7 @@
                             </select>
                         </div>
                     </div>
+
                     <hr>
                     <label class="dash-label">Google Script Web App URL (For saving data):</label>
                     <input type="text" id="dash-script-url" class="dash-input" placeholder="https://script.google.com/macros/s/...">
@@ -298,9 +324,19 @@
             <!-- TAB 2: Class Rosters -->
             <div id="tab-rosters" class="dash-tab-content">
                 <div style="background: rgba(0,0,0,0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                    <button class="dash-btn action small" onclick="addRosterCard()">➕ Add Class Roster</button>
-                    <p style="color:white; font-size:0.9rem;">Assign a class to a specific grade. When that grade is selected on the Start Screen, this class will appear in the dropdown!</p>
-                    <div id="roster-container"></div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+                        <h2 style="margin:0; color:white;">Class Rosters (By Grade)</h2>
+                        <div>
+                            <button class="dash-btn save small" style="margin:0;" onclick="addNewGrade()">➕ Add Grade</button>
+                            <button class="dash-btn danger small" style="margin:0 0 0 5px;" onclick="deleteCurrentGrade()">🗑️ Delete Grade</button>
+                        </div>
+                    </div>
+                    
+                    <div id="roster-tabs-container" class="roster-tabs"></div>
+                    <hr style="margin: 10px 0; border-color:rgba(255,255,255,0.1);">
+                    
+                    <button class="dash-btn action small" onclick="addRosterCard()">➕ Add Class to this Grade</button>
+                    <div id="roster-container" style="margin-top:15px;"></div>
                 </div>
             </div>
 
@@ -314,8 +350,8 @@
                         <select id="editor-grade" class="dash-input" onchange="changeEditTarget()"></select>
                     </div>
                 </div>
+
                 <div style="margin-bottom: 20px;">
-                    <!-- New cards will be added to the TOP -->
                     <button class="dash-btn action" onclick="addQuestionCard()">➕ Add New Test Card</button>
                 </div>
                 <div id="editor-container"></div>
@@ -432,17 +468,17 @@ const playWarning = () => { initAudio(); playTone(300, 'sawtooth', 0.3); }
 
 // --- Game Data & Configuration ---
 const DEFAULT_URL = "https://script.google.com/macros/s/AKfycbwe8u9jinO3KHPTvQy_y1pW8gMeIg9Yk6Qv4ReuC92GFBFJkBw14ZiXfnlWMO6t_rUo/exec";
-
 const SEMESTERS = ["First Semester", "Second Semester"];
-const GRADES = ["Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5", "Grade 6"];
 
-// Roster now includes "grade" to filter properly
 const defaultConfig = {
+    activeSemester: "First Semester", 
+    activeGrade: "Grade 1", 
     scriptUrl: DEFAULT_URL, 
     timerSeconds: 70, 
     fontFamily: "'Century Gothic', 'AppleGothic', sans-serif",
+    grades: ["Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5", "Grade 6"], // Dynamic Grades
     roster: [
-        { grade: "Grade 1", className: "1A", students: ["John Doe", "Jane Smith", "Emily Chen"] },
+        { grade: "Grade 1", className: "1A", students: ["John Doe", "Jane Smith", "Emily Chen", "Michael Wu"] },
         { grade: "Grade 3", className: "3B", students: ["Peter Parker", "Bruce Wayne"] }
     ],
     tests: {
@@ -459,31 +495,60 @@ const defaultConfig = {
 
 let config = JSON.parse(localStorage.getItem('oralTestConfig')) || defaultConfig;
 
-// Data Migration Script to support old formats
+// Data Migration Script to support old formats & dynamic grades
 if(config.cards && !config.tests) {
     config.tests = {};
     let fallbackKey = (config.semester || "First Semester") + "_" + (config.grade || "Grade 1");
     config.tests[fallbackKey] = config.cards;
     delete config.cards; 
 }
-// Retrofit roster grades if missing
-if(config.roster) {
-    config.roster.forEach(r => { if(!r.grade) r.grade = "Grade 1"; });
+if(!config.grades) {
+    config.grades = ["Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5", "Grade 6"];
+    // Catch any legacy custom grades
+    if(config.roster) { config.roster.forEach(r => { if(r.grade && !config.grades.includes(r.grade)) config.grades.push(r.grade); }); }
 }
-for(let key in config.tests) {
-    config.tests[key].forEach(card => { if(card.locked === undefined) card.locked = true; });
-}
+if(config.roster) { config.roster.forEach(r => { if(!r.grade) r.grade = "Grade 1"; }); }
+for(let key in config.tests) { config.tests[key].forEach(card => { if(card.locked === undefined) card.locked = true; }); }
 
 let pool = [];
 let completedStudents = {}; 
 let currentEditingKey = ""; 
+let activeRosterGrade = config.grades.length > 0 ? config.grades[0] : "";
 
 // Initialize App
 document.body.style.setProperty('--main-font', config.fontFamily || "'Century Gothic', 'AppleGothic', sans-serif");
-renderClassDropdown();
+document.getElementById('display-test-info').innerText = `${config.activeSemester} | ${config.activeGrade}`;
+updateGlobalGradeDropdowns();
+document.getElementById('start-semester').value = config.activeSemester;
 
 // Triggers when Semester changes to reset flow
 function resetSelection() {
+    renderClassDropdown();
+}
+
+// Global Grade Dropdown Population
+function updateGlobalGradeDropdowns() {
+    const selects = ['start-grade', 'dash-active-grade', 'editor-grade'];
+    selects.forEach(id => {
+        const el = document.getElementById(id);
+        if(el) {
+            let currentVal = el.value || config.activeGrade; // Attempt to preserve value
+            el.innerHTML = '';
+            if(config.grades && config.grades.length > 0) {
+                config.grades.forEach(g => {
+                    let opt = document.createElement('option');
+                    opt.value = g; opt.innerText = g;
+                    el.appendChild(opt);
+                });
+                if(config.grades.includes(currentVal)) el.value = currentVal;
+                else el.value = config.grades[0];
+            } else {
+                el.innerHTML = '<option value="">(No Grades Found)</option>';
+            }
+        }
+    });
+    
+    // Once dropdowns are updated, render the classes for the start screen
     renderClassDropdown();
 }
 
@@ -494,11 +559,8 @@ function renderClassDropdown() {
     classSel.innerHTML = '<option value="">-- Select Class --</option>';
     document.getElementById('student-grid').innerHTML = ''; // Clear students until a class is selected
     
-    if(config.roster && config.roster.length > 0) {
-        // Filter by the grade selected on the start screen
+    if(config.roster && config.roster.length > 0 && gradeVal) {
         let filteredRoster = config.roster.filter(r => r.grade === gradeVal);
-        
-        // Advanced Sorting Logic: Numbers sort properly (e.g. 2 comes before 10)
         let sortedRoster = filteredRoster.sort((a, b) => {
             return a.className.localeCompare(b.className, undefined, { numeric: true, sensitivity: 'base' });
         });
@@ -690,29 +752,32 @@ function resetGame() { playClick(); switchScreen('start-screen'); renderStudentG
 // ==========================================
 // TEACHER DASHBOARD GUI (TABBED + LOCKABLE CARDS)
 // ==========================================
-
 function populateEditorDropdowns() {
     const semSel = document.getElementById('editor-semester');
-    const grdSel = document.getElementById('editor-grade');
-    semSel.innerHTML = ''; grdSel.innerHTML = '';
-    
+    semSel.innerHTML = '';
     SEMESTERS.forEach(s => { let o = document.createElement('option'); o.value = s; o.innerText = s; semSel.appendChild(o); });
-    GRADES.forEach(g => { let o = document.createElement('option'); o.value = g; o.innerText = g; grdSel.appendChild(o); });
+    // editor-grade is populated by updateGlobalGradeDropdowns
 }
 
 function openDashboard() {
     playSelect(); document.getElementById('dashboard-modal').style.display = 'block';
     
+    document.getElementById('dash-active-semester').value = config.activeSemester;
+    updateGlobalGradeDropdowns();
+    document.getElementById('dash-active-grade').value = config.activeGrade;
     document.getElementById('dash-script-url').value = config.scriptUrl;
     document.getElementById('dash-timer').value = config.timerSeconds;
     document.getElementById('dash-font').value = config.fontFamily;
     
+    // Ensure roster active grade is valid
+    if(!activeRosterGrade && config.grades && config.grades.length > 0) activeRosterGrade = config.grades[0];
+    
     renderRosterEditor(); 
     
     populateEditorDropdowns();
-    document.getElementById('editor-semester').value = document.getElementById('start-semester').value;
-    document.getElementById('editor-grade').value = document.getElementById('start-grade').value;
-    currentEditingKey = document.getElementById('start-semester').value + "_" + document.getElementById('start-grade').value;
+    document.getElementById('editor-semester').value = config.activeSemester;
+    document.getElementById('editor-grade').value = config.activeGrade;
+    currentEditingKey = config.activeSemester + "_" + config.activeGrade;
     
     renderCardEditor(); 
     openDashTab('tab-general'); 
@@ -731,14 +796,21 @@ function openDashTab(tabId) {
 }
 
 function syncDashboardToConfig() {
-    let newRoster = [];
-    document.querySelectorAll('.roster-card').forEach(rc => {
-        let gName = rc.querySelector('.r-grade').value;
-        let cName = rc.querySelector('.r-class').value.trim();
-        let sList = rc.querySelector('.r-students').value.split('\n').map(s => s.trim()).filter(s => s !== "");
-        if(cName) newRoster.push({ grade: gName, className: cName, students: sList });
-    });
-    config.roster = newRoster;
+    // 1. Sync Active Roster Tab
+    if(activeRosterGrade) {
+        let updatedClassesForGrade = [];
+        document.querySelectorAll('.roster-card').forEach(rc => {
+            let cName = rc.querySelector('.r-class').value.trim();
+            let sList = rc.querySelector('.r-students').value.split('\n').map(s => s.trim()).filter(s => s !== "");
+            if(cName) updatedClassesForGrade.push({ grade: activeRosterGrade, className: cName, students: sList });
+        });
+        // Remove old classes for this grade
+        config.roster = config.roster.filter(r => r.grade !== activeRosterGrade);
+        // Inject updated classes
+        config.roster.push(...updatedClassesForGrade);
+    }
+
+    // 2. Sync Editor Cards to current target key
     syncCardsToConfig(currentEditingKey);
 }
 
@@ -775,27 +847,83 @@ function syncCardsToConfig(key) {
     config.tests[key] = newCards;
 }
 
+// Custom Grade Functions
+function addNewGrade() {
+    let newGrade = prompt("Enter new grade name (e.g., Kindergarten, Advanced):");
+    if(newGrade && newGrade.trim() !== "") {
+        newGrade = newGrade.trim();
+        if(!config.grades.includes(newGrade)) {
+            syncDashboardToConfig(); 
+            config.grades.push(newGrade);
+            activeRosterGrade = newGrade;
+            updateGlobalGradeDropdowns();
+            renderRosterEditor();
+        } else {
+            alert("This grade already exists.");
+        }
+    }
+}
+
+function deleteCurrentGrade() {
+    if(confirm(`Are you sure you want to completely delete "${activeRosterGrade}" and all its classes?`)) {
+        config.grades = config.grades.filter(g => g !== activeRosterGrade);
+        config.roster = config.roster.filter(r => r.grade !== activeRosterGrade);
+        
+        // Remove associated test banks
+        for(let key in config.tests) {
+            if(key.endsWith("_" + activeRosterGrade)) delete config.tests[key];
+        }
+        
+        activeRosterGrade = config.grades.length > 0 ? config.grades[0] : null;
+        updateGlobalGradeDropdowns();
+        renderRosterEditor();
+    }
+}
+
+function switchRosterGrade(grade) {
+    playClick();
+    syncDashboardToConfig();
+    activeRosterGrade = grade;
+    renderRosterEditor();
+}
+
 function renderRosterEditor() {
-    const container = document.getElementById('roster-container'); container.innerHTML = '';
-    if(!config.roster) config.roster = [];
-    config.roster.forEach((r, idx) => {
+    const tabsContainer = document.getElementById('roster-tabs-container');
+    const container = document.getElementById('roster-container');
+    tabsContainer.innerHTML = '';
+    container.innerHTML = '';
+
+    if(!config.grades || config.grades.length === 0) return;
+
+    // Render Grade Sub-tabs
+    config.grades.forEach(g => {
+        let btn = document.createElement('button');
+        btn.className = 'roster-tab' + (g === activeRosterGrade ? ' active' : '');
+        btn.innerText = g;
+        btn.onclick = () => switchRosterGrade(g);
+        tabsContainer.appendChild(btn);
+    });
+
+    let targetRoster = config.roster.filter(r => r.grade === activeRosterGrade);
+    
+    targetRoster.forEach((r, idx) => {
         let div = document.createElement('div'); div.className = 'roster-card';
         div.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <div style="display:flex; gap:10px;">
-                    <select class="dash-input r-grade" style="max-width:150px; margin:0;">
-                        ${GRADES.map(g => `<option value="${g}" ${r.grade===g?'selected':''}>${g}</option>`).join('')}
-                    </select>
-                    <input type="text" class="dash-input r-class" value="${r.className}" placeholder="Class Name (e.g. 3A)" style="max-width:200px; margin:0;">
-                </div>
-                <button class="dash-btn danger small" onclick="this.parentElement.parentElement.remove()">🗑️ Delete</button>
+                <input type="text" class="dash-input r-class" value="${r.className}" placeholder="Class Name (e.g. 3A)" style="max-width:200px; margin:0;">
+                <button class="dash-btn danger small" onclick="this.parentElement.parentElement.remove()">🗑️ Delete Class</button>
             </div>
             <textarea class="dash-input r-students" style="height:100px; font-weight:normal; margin-top:10px;" placeholder="Paste student names here... (one per line)">${r.students.join('\n')}</textarea>
         `;
         container.appendChild(div);
     });
 }
-function addRosterCard() { syncDashboardToConfig(); config.roster.unshift({ grade: "Grade 1", className: "", students: [] }); renderRosterEditor(); }
+function addRosterCard() { 
+    if(!activeRosterGrade) return alert("Please add a Grade first!");
+    syncDashboardToConfig(); 
+    config.roster.push({ grade: activeRosterGrade, className: "", students: [] }); 
+    renderRosterEditor(); 
+}
 
 function changeEditTarget() {
     playClick(); syncCardsToConfig(currentEditingKey); 
@@ -909,6 +1037,8 @@ function deleteCard(idx) {
 
 function saveDashboard() {
     playClick();
+    config.activeSemester = document.getElementById('dash-active-semester').value;
+    config.activeGrade = document.getElementById('dash-active-grade').value;
     config.scriptUrl = document.getElementById('dash-script-url').value.trim();
     config.timerSeconds = parseInt(document.getElementById('dash-timer').value) || 70;
     config.fontFamily = document.getElementById('dash-font').value;
@@ -917,6 +1047,12 @@ function saveDashboard() {
     localStorage.setItem('oralTestConfig', JSON.stringify(config));
     
     document.body.style.setProperty('--main-font', config.fontFamily);
+    document.getElementById('display-test-info').innerText = `${config.activeSemester} | ${config.activeGrade}`;
+    
+    // Ensure start screen gets updated
+    document.getElementById('start-semester').value = config.activeSemester;
+    document.getElementById('start-grade').value = config.activeGrade;
+
     pool = []; 
     renderClassDropdown(); 
     document.getElementById('student-grid').innerHTML = ''; 
@@ -943,7 +1079,10 @@ function importData(event) {
                     config.tests[fallbackKey] = config.cards;
                     delete config.cards; 
                 }
+                if(!config.grades) config.grades = ["Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5", "Grade 6"];
+                
                 document.body.style.setProperty('--main-font', config.fontFamily || "'Century Gothic', 'AppleGothic', sans-serif");
+                updateGlobalGradeDropdowns();
                 alert("Import successful! Opening Dashboard to verify data. Don't forget to click 'Save Settings ✅' to apply.");
                 openDashboard(); 
             } else { alert("Invalid file format."); }
