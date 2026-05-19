@@ -73,14 +73,13 @@
     .school-title { font-size: clamp(1.5rem, 3vw, 2.5rem); color: var(--primary); text-shadow: 2px 2px 0px var(--secondary-dark); margin-bottom: 0; text-transform: uppercase; letter-spacing: 2px;}
     .main-title { font-size: clamp(3.5rem, 7vw, 5rem); text-align: center; color: var(--white); margin-top: 5px; margin-bottom: 20px; text-shadow: 4px 4px 0px var(--secondary-dark); }
     .screen h2 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 20px; text-align: center; color: var(--white); text-shadow: 2px 2px 0px rgba(0,0,0,0.2); }
-    .test-info { font-size: 1.5rem; color: var(--secondary); margin-bottom: 30px; background: var(--primary); padding: 10px 30px; border-radius: 20px; box-shadow: 0 6px 0 var(--primary-dark); border: 3px solid white;}
-
-    .input-group { display: flex; flex-direction: row; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 800px; }
+    
+    .input-group { display: flex; flex-direction: row; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 900px; }
 
     .game-input {
-        font-family: var(--main-font); font-weight: bold; font-size: 1.8rem; padding: 15px 20px; border: 5px solid var(--primary);
+        font-family: var(--main-font); font-weight: bold; font-size: 1.5rem; padding: 15px 20px; border: 5px solid var(--primary);
         border-radius: 20px; outline: none; text-align: center; background-color: var(--white); color: var(--text-dark);
-        box-shadow: 0 6px 0 rgba(0,0,0,0.1); flex: 1; min-width: 250px; cursor: pointer;
+        box-shadow: 0 6px 0 rgba(0,0,0,0.1); flex: 1; min-width: 200px; cursor: pointer;
     }
 
     /* Standard Game Buttons */
@@ -90,7 +89,7 @@
         box-shadow: 0 8px 0 var(--primary-dark); transition: transform 0.1s, box-shadow 0.1s; min-width: 220px; min-height: 70px; text-transform: uppercase;
     }
     .game-btn:active { transform: translateY(8px); box-shadow: 0 0 0 var(--primary-dark); }
-    .game-btn.start-btn { background-color: var(--primary); font-size: 2.5rem; padding: 20px 60px; }
+    .game-btn.start-btn { background-color: var(--primary); font-size: 2.5rem; padding: 20px 60px; margin-top: 20px;}
     .game-btn.alt-btn { background-color: var(--accent); color: white; box-shadow: 0 8px 0 var(--accent-dark); }
     .game-btn.alt-btn:active { box-shadow: 0 0 0 var(--accent-dark); }
     .game-btn.submit-btn { background-color: var(--correct); color: white; box-shadow: 0 8px 0 var(--correct-dark); }
@@ -100,32 +99,17 @@
 
     /* Clean Student Grid Elements */
     #student-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
         gap: 12px; margin-top: 20px; width: 100%; max-width: 1000px;
     }
     .student-btn {
-        font-family: var(--main-font); 
-        font-weight: bold; 
-        font-size: 1.1rem; 
-        padding: 12px 15px; 
-        border: none;
-        border-radius: 12px; 
-        background-color: var(--white); 
-        color: var(--secondary-dark); 
-        cursor: pointer;
-        box-shadow: 0 4px 0 rgba(0,0,0,0.15); 
-        transition: transform 0.1s, box-shadow 0.1s, background-color 0.2s;
-        width: 100%; 
-        white-space: nowrap; 
-        overflow: hidden; 
-        text-overflow: ellipsis;
-        text-align: left; 
+        font-family: var(--main-font); font-weight: bold; font-size: 1.1rem; padding: 12px 15px; 
+        border: none; border-radius: 12px; background-color: var(--white); color: var(--secondary-dark); 
+        cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.15); transition: transform 0.1s, box-shadow 0.1s, background-color 0.2s;
+        width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; 
     }
     .student-btn:active { transform: translateY(4px); box-shadow: 0 0 0 rgba(0,0,0,0.15); }
-    .student-btn.completed {
-        background-color: #ADB5BD; color: #495057; box-shadow: 0 4px 0 #868E96; text-decoration: line-through; opacity: 0.7;
-    }
+    .student-btn.completed { background-color: #ADB5BD; color: #495057; box-shadow: 0 4px 0 #868E96; text-decoration: line-through; opacity: 0.7; }
     .student-btn.completed:active { transform: translateY(4px); box-shadow: 0 0 0 #868E96; }
 
     /* Part 1 */
@@ -207,13 +191,24 @@
 
     <div id="top-bar"><div id="timer-display">01:10</div></div>
 
-    <!-- Start Screen -->
+    <!-- Start Screen (Now contains the active assignments) -->
     <div id="start-screen" class="screen active">
         <h1 class="school-title">Sanxing English Village</h1>
         <h1 class="main-title">Oral English Test</h1>
-        <div class="test-info" id="display-test-info">First Semester | Grade 1</div>
         
         <div class="input-group">
+            <select id="start-semester" class="game-input" onchange="resetSelection()">
+                <option value="First Semester">First Semester</option>
+                <option value="Second Semester">Second Semester</option>
+            </select>
+            <select id="start-grade" class="game-input" onchange="renderClassDropdown()">
+                <option value="Grade 1">Grade 1</option>
+                <option value="Grade 2">Grade 2</option>
+                <option value="Grade 3">Grade 3</option>
+                <option value="Grade 4">Grade 4</option>
+                <option value="Grade 5">Grade 5</option>
+                <option value="Grade 6">Grade 6</option>
+            </select>
             <select id="class-select" class="game-input" onchange="renderStudentGrid()">
                 <option value="">-- Select Class --</option>
             </select>
@@ -276,30 +271,6 @@
             <!-- TAB 1: General Settings -->
             <div id="tab-general" class="dash-tab-content active">
                 <div style="background: rgba(0,0,0,0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                    <h2 style="margin-top:0; color:white;">Active Test Assignment</h2>
-                    <p style="color:#CAF0F8; margin-bottom:15px;">Which test are the students taking right now?</p>
-                    <div class="grid-2">
-                        <div>
-                            <label class="dash-label">Active Semester:</label>
-                            <select id="dash-active-semester" class="dash-input">
-                                <option value="First Semester">First Semester</option>
-                                <option value="Second Semester">Second Semester</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="dash-label">Active Grade Level:</label>
-                            <select id="dash-active-grade" class="dash-input">
-                                <option value="Grade 1">Grade 1</option>
-                                <option value="Grade 2">Grade 2</option>
-                                <option value="Grade 3">Grade 3</option>
-                                <option value="Grade 4">Grade 4</option>
-                                <option value="Grade 5">Grade 5</option>
-                                <option value="Grade 6">Grade 6</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <hr>
                     <h2 style="margin-top:0; color:white;">Global Settings</h2>
                     <div class="grid-2" style="margin-top: 10px;">
                         <div>
@@ -317,8 +288,8 @@
                             </select>
                         </div>
                     </div>
-
-                    <label class="dash-label" style="margin-top:20px;">Google Script Web App URL (For saving data):</label>
+                    <hr>
+                    <label class="dash-label">Google Script Web App URL (For saving data):</label>
                     <input type="text" id="dash-script-url" class="dash-input" placeholder="https://script.google.com/macros/s/...">
                     <button class="dash-btn help-btn" onclick="openHelpModal()">❓ Need Help Setting Up Google Drive?</button>
                 </div>
@@ -328,7 +299,7 @@
             <div id="tab-rosters" class="dash-tab-content">
                 <div style="background: rgba(0,0,0,0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
                     <button class="dash-btn action small" onclick="addRosterCard()">➕ Add Class Roster</button>
-                    <p style="color:white; font-size:0.9rem;">Add a class block, name it, and paste the students below it. They will automatically appear as buttons on the home screen!</p>
+                    <p style="color:white; font-size:0.9rem;">Assign a class to a specific grade. When that grade is selected on the Start Screen, this class will appear in the dropdown!</p>
                     <div id="roster-container"></div>
                 </div>
             </div>
@@ -343,12 +314,10 @@
                         <select id="editor-grade" class="dash-input" onchange="changeEditTarget()"></select>
                     </div>
                 </div>
-
                 <div style="margin-bottom: 20px;">
                     <!-- New cards will be added to the TOP -->
                     <button class="dash-btn action" onclick="addQuestionCard()">➕ Add New Test Card</button>
                 </div>
-                
                 <div id="editor-container"></div>
             </div>
 
@@ -467,15 +436,14 @@ const DEFAULT_URL = "https://script.google.com/macros/s/AKfycbwe8u9jinO3KHPTvQy_
 const SEMESTERS = ["First Semester", "Second Semester"];
 const GRADES = ["Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5", "Grade 6"];
 
+// Roster now includes "grade" to filter properly
 const defaultConfig = {
-    activeSemester: "First Semester", 
-    activeGrade: "Grade 1", 
     scriptUrl: DEFAULT_URL, 
     timerSeconds: 70, 
     fontFamily: "'Century Gothic', 'AppleGothic', sans-serif",
     roster: [
-        { className: "3A", students: ["John Doe", "Jane Smith", "Emily Chen", "Michael Wu"] },
-        { className: "10B", students: ["Peter Parker", "Bruce Wayne"] }
+        { grade: "Grade 1", className: "1A", students: ["John Doe", "Jane Smith", "Emily Chen"] },
+        { grade: "Grade 3", className: "3B", students: ["Peter Parker", "Bruce Wayne"] }
     ],
     tests: {
         "First Semester_Grade 1": [
@@ -491,21 +459,19 @@ const defaultConfig = {
 
 let config = JSON.parse(localStorage.getItem('oralTestConfig')) || defaultConfig;
 
-// Data Migration Script
+// Data Migration Script to support old formats
 if(config.cards && !config.tests) {
     config.tests = {};
     let fallbackKey = (config.semester || "First Semester") + "_" + (config.grade || "Grade 1");
     config.tests[fallbackKey] = config.cards;
     delete config.cards; 
-    if(!config.activeSemester) config.activeSemester = config.semester || "First Semester";
-    if(!config.activeGrade) config.activeGrade = config.grade || "Grade 1";
 }
-
-// Add 'locked' property retroactively to any old cards missing it
+// Retrofit roster grades if missing
+if(config.roster) {
+    config.roster.forEach(r => { if(!r.grade) r.grade = "Grade 1"; });
+}
 for(let key in config.tests) {
-    config.tests[key].forEach(card => {
-        if(card.locked === undefined) card.locked = true; 
-    });
+    config.tests[key].forEach(card => { if(card.locked === undefined) card.locked = true; });
 }
 
 let pool = [];
@@ -514,16 +480,29 @@ let currentEditingKey = "";
 
 // Initialize App
 document.body.style.setProperty('--main-font', config.fontFamily || "'Century Gothic', 'AppleGothic', sans-serif");
-document.getElementById('display-test-info').innerText = `${config.activeSemester} | ${config.activeGrade}`;
 renderClassDropdown();
 
+// Triggers when Semester changes to reset flow
+function resetSelection() {
+    renderClassDropdown();
+}
+
+// ALPHANUMERIC SORTING & GRADE FILTERING
 function renderClassDropdown() {
+    const gradeVal = document.getElementById('start-grade').value;
     const classSel = document.getElementById('class-select');
     classSel.innerHTML = '<option value="">-- Select Class --</option>';
+    document.getElementById('student-grid').innerHTML = ''; // Clear students until a class is selected
+    
     if(config.roster && config.roster.length > 0) {
-        let sortedRoster = [...config.roster].sort((a, b) => {
+        // Filter by the grade selected on the start screen
+        let filteredRoster = config.roster.filter(r => r.grade === gradeVal);
+        
+        // Advanced Sorting Logic: Numbers sort properly (e.g. 2 comes before 10)
+        let sortedRoster = filteredRoster.sort((a, b) => {
             return a.className.localeCompare(b.className, undefined, { numeric: true, sensitivity: 'base' });
         });
+
         sortedRoster.forEach(r => {
             let opt = document.createElement('option');
             opt.value = r.className; opt.innerText = r.className;
@@ -562,7 +541,9 @@ function shuffle(array) {
 
 function getNextCard() {
     if (pool.length === 0) { 
-        let key = config.activeSemester + "_" + config.activeGrade;
+        let activeSem = document.getElementById('start-semester').value;
+        let activeGrade = document.getElementById('start-grade').value;
+        let key = activeSem + "_" + activeGrade;
         let testBank = config.tests[key] || [];
         pool = JSON.parse(JSON.stringify(testBank)); 
         shuffle(pool); 
@@ -580,9 +561,12 @@ function startTest(className, studentName) {
     playClick();
     currentClass = className; currentStudent = studentName;
     
-    let key = config.activeSemester + "_" + config.activeGrade;
+    let activeSem = document.getElementById('start-semester').value;
+    let activeGrade = document.getElementById('start-grade').value;
+    let key = activeSem + "_" + activeGrade;
+    
     if(!config.tests[key] || config.tests[key].length === 0) {
-        return alert("Teacher: There are no questions for this Semester/Grade yet. Please add them in the Dashboard!");
+        return alert("Teacher: There are no questions for this Semester/Grade combination yet. Please add them in the Dashboard!");
     }
     
     activeCard = getNextCard();
@@ -689,7 +673,10 @@ function submitToDrive() {
     if(!config.scriptUrl) return alert("Teacher: Set the Google Script URL in Dashboard!");
     const btn = document.getElementById('submit-btn'); btn.innerText = "Saving to Drive... ⏳"; btn.disabled = true;
     const payload = {
-        semester: config.activeSemester, grade: config.activeGrade, className: currentClass, studentName: currentStudent,
+        semester: document.getElementById('start-semester').value, 
+        grade: document.getElementById('start-grade').value, 
+        className: currentClass, 
+        studentName: currentStudent,
         totalScore: part1Score + q1Score + q2Score, readingScore: part1Score, q1Score: q1Score, q2Score: q2Score, missedWords: missedWordsArr.join(", ") || "None"
     };
 
@@ -716,8 +703,6 @@ function populateEditorDropdowns() {
 function openDashboard() {
     playSelect(); document.getElementById('dashboard-modal').style.display = 'block';
     
-    document.getElementById('dash-active-semester').value = config.activeSemester;
-    document.getElementById('dash-active-grade').value = config.activeGrade;
     document.getElementById('dash-script-url').value = config.scriptUrl;
     document.getElementById('dash-timer').value = config.timerSeconds;
     document.getElementById('dash-font').value = config.fontFamily;
@@ -725,9 +710,9 @@ function openDashboard() {
     renderRosterEditor(); 
     
     populateEditorDropdowns();
-    document.getElementById('editor-semester').value = config.activeSemester;
-    document.getElementById('editor-grade').value = config.activeGrade;
-    currentEditingKey = config.activeSemester + "_" + config.activeGrade;
+    document.getElementById('editor-semester').value = document.getElementById('start-semester').value;
+    document.getElementById('editor-grade').value = document.getElementById('start-grade').value;
+    currentEditingKey = document.getElementById('start-semester').value + "_" + document.getElementById('start-grade').value;
     
     renderCardEditor(); 
     openDashTab('tab-general'); 
@@ -745,13 +730,13 @@ function openDashTab(tabId) {
     event.currentTarget.classList.add('active');
 }
 
-// SECURE DATA SYNCING: Handles both locked and unlocked card states
 function syncDashboardToConfig() {
     let newRoster = [];
     document.querySelectorAll('.roster-card').forEach(rc => {
+        let gName = rc.querySelector('.r-grade').value;
         let cName = rc.querySelector('.r-class').value.trim();
         let sList = rc.querySelector('.r-students').value.split('\n').map(s => s.trim()).filter(s => s !== "");
-        if(cName) newRoster.push({ className: cName, students: sList });
+        if(cName) newRoster.push({ grade: gName, className: cName, students: sList });
     });
     config.roster = newRoster;
     syncCardsToConfig(currentEditingKey);
@@ -764,12 +749,9 @@ function syncCardsToConfig(key) {
 
     document.querySelectorAll('#editor-container .q-card').forEach((cardDom, i) => {
         let isLocked = cardDom.dataset.locked === "true";
-        
         if(isLocked) {
-            // Card is collapsed, so it has no input elements. Pull from memory securely.
             newCards.push(currentCardsMem[i]);
         } else {
-            // Card is expanded, scrape the input elements.
             let p1Mode = cardDom.querySelector('.c-p1mode').value;
             let manualWords = [];
             cardDom.querySelectorAll('.manual-word-row').forEach(row => {
@@ -778,28 +760,17 @@ function syncCardsToConfig(key) {
                 if(w) manualWords.push({ word: w, pts: p });
             });
             newCards.push({
-                p1Mode: p1Mode, 
-                sentence: cardDom.querySelector('.c-sent')?.value || "", 
-                manualWords: manualWords,
+                p1Mode: p1Mode, sentence: cardDom.querySelector('.c-sent')?.value || "", manualWords: manualWords,
                 q1: cardDom.querySelector('.c-q1').value, 
-                q1opts: [
-                    cardDom.querySelector('.c-q1o0').value, cardDom.querySelector('.c-q1o1').value, 
-                    cardDom.querySelector('.c-q1o2').value, cardDom.querySelector('.c-q1o3').value
-                ], 
-                q1ans: parseInt(cardDom.querySelector('.c-q1ans').value), 
-                q1pts: parseInt(cardDom.querySelector('.c-q1pts').value) || 0,
+                q1opts: [cardDom.querySelector('.c-q1o0').value, cardDom.querySelector('.c-q1o1').value, cardDom.querySelector('.c-q1o2').value, cardDom.querySelector('.c-q1o3').value], 
+                q1ans: parseInt(cardDom.querySelector('.c-q1ans').value), q1pts: parseInt(cardDom.querySelector('.c-q1pts').value) || 0,
                 q2: cardDom.querySelector('.c-q2').value, 
-                q2opts: [
-                    cardDom.querySelector('.c-q2o0').value, cardDom.querySelector('.c-q2o1').value, 
-                    cardDom.querySelector('.c-q2o2').value, cardDom.querySelector('.c-q2o3').value
-                ], 
-                q2ans: parseInt(cardDom.querySelector('.c-q2ans').value), 
-                q2pts: parseInt(cardDom.querySelector('.c-q2pts').value) || 0,
-                locked: false // We are actively editing it
+                q2opts: [cardDom.querySelector('.c-q2o0').value, cardDom.querySelector('.c-q2o1').value, cardDom.querySelector('.c-q2o2').value, cardDom.querySelector('.c-q2o3').value], 
+                q2ans: parseInt(cardDom.querySelector('.c-q2ans').value), q2pts: parseInt(cardDom.querySelector('.c-q2pts').value) || 0,
+                locked: false 
             });
         }
     });
-    
     if(!config.tests) config.tests = {};
     config.tests[key] = newCards;
 }
@@ -811,23 +782,25 @@ function renderRosterEditor() {
         let div = document.createElement('div'); div.className = 'roster-card';
         div.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <input type="text" class="dash-input r-class" value="${r.className}" placeholder="Class Name (e.g. 3A)" style="max-width:200px; margin:0;">
-                <button class="dash-btn danger small" onclick="this.parentElement.parentElement.remove()">🗑️ Delete Class</button>
+                <div style="display:flex; gap:10px;">
+                    <select class="dash-input r-grade" style="max-width:150px; margin:0;">
+                        ${GRADES.map(g => `<option value="${g}" ${r.grade===g?'selected':''}>${g}</option>`).join('')}
+                    </select>
+                    <input type="text" class="dash-input r-class" value="${r.className}" placeholder="Class Name (e.g. 3A)" style="max-width:200px; margin:0;">
+                </div>
+                <button class="dash-btn danger small" onclick="this.parentElement.parentElement.remove()">🗑️ Delete</button>
             </div>
             <textarea class="dash-input r-students" style="height:100px; font-weight:normal; margin-top:10px;" placeholder="Paste student names here... (one per line)">${r.students.join('\n')}</textarea>
         `;
         container.appendChild(div);
     });
 }
-function addRosterCard() { syncDashboardToConfig(); config.roster.push({ className: "", students: [] }); renderRosterEditor(); }
+function addRosterCard() { syncDashboardToConfig(); config.roster.unshift({ grade: "Grade 1", className: "", students: [] }); renderRosterEditor(); }
 
 function changeEditTarget() {
-    playClick();
-    syncCardsToConfig(currentEditingKey); 
-    let sem = document.getElementById('editor-semester').value;
-    let grd = document.getElementById('editor-grade').value;
-    currentEditingKey = sem + "_" + grd;
-    renderCardEditor(); 
+    playClick(); syncCardsToConfig(currentEditingKey); 
+    let sem = document.getElementById('editor-semester').value; let grd = document.getElementById('editor-grade').value;
+    currentEditingKey = sem + "_" + grd; renderCardEditor(); 
 }
 
 function renderCardEditor() {
@@ -835,18 +808,13 @@ function renderCardEditor() {
     let targetCards = config.tests && config.tests[currentEditingKey] ? config.tests[currentEditingKey] : [];
 
     if(targetCards.length === 0) {
-        container.innerHTML = '<p style="color:white; font-style:italic;">No questions added for this semester/grade yet.</p>';
-        return;
+        container.innerHTML = '<p style="color:white; font-style:italic;">No questions added for this semester/grade yet.</p>'; return;
     }
 
     targetCards.forEach((card, index) => {
-        const div = document.createElement('div'); 
-        div.className = 'q-card';
-        
-        // If card is locked, show collapsed view
+        const div = document.createElement('div'); div.className = 'q-card';
         if(card.locked) {
-            div.dataset.locked = "true";
-            div.classList.add('locked');
+            div.dataset.locked = "true"; div.classList.add('locked');
             div.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <h3 style="color:white; margin:0;">Card ${targetCards.length - index}</h3>
@@ -857,21 +825,12 @@ function renderCardEditor() {
                 </div>
                 <p style="color:#CAF0F8; margin: 10px 0 0 0; font-style:italic;">"${card.sentence ? card.sentence.substring(0,50) + '...' : '(No sentence text)'}"</p>
             `;
-        } 
-        // If card is unlocked, show full editor
-        else {
-            div.dataset.locked = "false";
-            div.classList.remove('locked');
-            
+        } else {
+            div.dataset.locked = "false"; div.classList.remove('locked');
             let manualWordsHTML = '';
             if(card.manualWords) {
                 card.manualWords.forEach(mw => {
-                    manualWordsHTML += `
-                    <div class="manual-word-row" style="display:flex; gap:10px; margin-bottom:5px;">
-                        <input type="text" class="dash-input c-mw-word" value="${mw.word}" placeholder="Word" style="flex:2; margin:0;">
-                        <input type="number" class="dash-input c-mw-pts" value="${mw.pts}" placeholder="Pts" style="flex:1; margin:0;">
-                        <button class="dash-btn danger small" onclick="this.parentElement.remove()" style="margin:0;">X</button>
-                    </div>`;
+                    manualWordsHTML += `<div class="manual-word-row" style="display:flex; gap:10px; margin-bottom:5px;"><input type="text" class="dash-input c-mw-word" value="${mw.word}" placeholder="Word" style="flex:2; margin:0;"><input type="number" class="dash-input c-mw-pts" value="${mw.pts}" placeholder="Pts" style="flex:1; margin:0;"><button class="dash-btn danger small" onclick="this.parentElement.remove()" style="margin:0;">X</button></div>`;
                 });
             }
             div.innerHTML = `
@@ -884,30 +843,17 @@ function renderCardEditor() {
                     <option value="auto" ${card.p1Mode === 'auto' ? 'selected' : ''}>Automatic (20 pts divided evenly)</option>
                     <option value="manual" ${card.p1Mode === 'manual' ? 'selected' : ''}>Manual (Add specific words & points)</option>
                 </select>
-                <div class="ui-auto" style="display: ${card.p1Mode === 'auto' ? 'block' : 'none'};">
-                    <label class="dash-label">Sentence</label>
-                    <input type="text" class="dash-input c-sent" value="${card.sentence}" placeholder="e.g. The quick brown fox...">
-                </div>
-                <div class="ui-manual" style="display: ${card.p1Mode === 'manual' ? 'block' : 'none'}; background:rgba(0,0,0,0.2); padding:10px; border-radius:5px;">
-                    <label class="dash-label">Words & Points List</label>
-                    <div class="mw-container">${manualWordsHTML}</div>
-                    <button class="dash-btn action small" style="margin-top:10px;" onclick="addManualWordRow(this)">➕ Add Word</button>
-                </div>
+                <div class="ui-auto" style="display: ${card.p1Mode === 'auto' ? 'block' : 'none'};"><label class="dash-label">Sentence</label><input type="text" class="dash-input c-sent" value="${card.sentence}" placeholder="e.g. The quick brown fox..."></div>
+                <div class="ui-manual" style="display: ${card.p1Mode === 'manual' ? 'block' : 'none'}; background:rgba(0,0,0,0.2); padding:10px; border-radius:5px;"><label class="dash-label">Words & Points List</label><div class="mw-container">${manualWordsHTML}</div><button class="dash-btn action small" style="margin-top:10px;" onclick="addManualWordRow(this)">➕ Add Word</button></div>
                 <hr>
                 <div class="grid-2">
                     <div>
                         <label class="dash-label">Q1 Text</label><input type="text" class="dash-input c-q1" value="${card.q1}">
                         <label class="dash-label">Options</label>
-                        <input type="text" class="dash-input c-q1o0" value="${card.q1opts[0] || ''}">
-                        <input type="text" class="dash-input c-q1o1" value="${card.q1opts[1] || ''}">
-                        <input type="text" class="dash-input c-q1o2" value="${card.q1opts[2] || ''}">
-                        <input type="text" class="dash-input c-q1o3" value="${card.q1opts[3] || ''}">
+                        <input type="text" class="dash-input c-q1o0" value="${card.q1opts[0] || ''}"><input type="text" class="dash-input c-q1o1" value="${card.q1opts[1] || ''}"><input type="text" class="dash-input c-q1o2" value="${card.q1opts[2] || ''}"><input type="text" class="dash-input c-q1o3" value="${card.q1opts[3] || ''}">
                         <div style="display:flex; gap:10px;">
                             <select class="dash-input c-q1ans" style="flex:2;">
-                                <option value="0" ${card.q1ans == 0 ? 'selected' : ''}>Correct: Option 1</option>
-                                <option value="1" ${card.q1ans == 1 ? 'selected' : ''}>Correct: Option 2</option>
-                                <option value="2" ${card.q1ans == 2 ? 'selected' : ''}>Correct: Option 3</option>
-                                <option value="3" ${card.q1ans == 3 ? 'selected' : ''}>Correct: Option 4</option>
+                                <option value="0" ${card.q1ans == 0 ? 'selected' : ''}>Correct: Option 1</option><option value="1" ${card.q1ans == 1 ? 'selected' : ''}>Correct: Option 2</option><option value="2" ${card.q1ans == 2 ? 'selected' : ''}>Correct: Option 3</option><option value="3" ${card.q1ans == 3 ? 'selected' : ''}>Correct: Option 4</option>
                             </select>
                             <input type="number" class="dash-input c-q1pts" value="${card.q1pts}" placeholder="Pts" style="flex:1;">
                         </div>
@@ -915,16 +861,10 @@ function renderCardEditor() {
                     <div>
                         <label class="dash-label">Q2 Text</label><input type="text" class="dash-input c-q2" value="${card.q2}">
                         <label class="dash-label">Options</label>
-                        <input type="text" class="dash-input c-q2o0" value="${card.q2opts[0] || ''}">
-                        <input type="text" class="dash-input c-q2o1" value="${card.q2opts[1] || ''}">
-                        <input type="text" class="dash-input c-q2o2" value="${card.q2opts[2] || ''}">
-                        <input type="text" class="dash-input c-q2o3" value="${card.q2opts[3] || ''}">
+                        <input type="text" class="dash-input c-q2o0" value="${card.q2opts[0] || ''}"><input type="text" class="dash-input c-q2o1" value="${card.q2opts[1] || ''}"><input type="text" class="dash-input c-q2o2" value="${card.q2opts[2] || ''}"><input type="text" class="dash-input c-q2o3" value="${card.q2opts[3] || ''}">
                         <div style="display:flex; gap:10px;">
                             <select class="dash-input c-q2ans" style="flex:2;">
-                                <option value="0" ${card.q2ans == 0 ? 'selected' : ''}>Correct: Option 1</option>
-                                <option value="1" ${card.q2ans == 1 ? 'selected' : ''}>Correct: Option 2</option>
-                                <option value="2" ${card.q2ans == 2 ? 'selected' : ''}>Correct: Option 3</option>
-                                <option value="3" ${card.q2ans == 3 ? 'selected' : ''}>Correct: Option 4</option>
+                                <option value="0" ${card.q2ans == 0 ? 'selected' : ''}>Correct: Option 1</option><option value="1" ${card.q2ans == 1 ? 'selected' : ''}>Correct: Option 2</option><option value="2" ${card.q2ans == 2 ? 'selected' : ''}>Correct: Option 3</option><option value="3" ${card.q2ans == 3 ? 'selected' : ''}>Correct: Option 4</option>
                             </select>
                             <input type="number" class="dash-input c-q2pts" value="${card.q2pts}" placeholder="Pts" style="flex:1;">
                         </div>
@@ -938,10 +878,8 @@ function renderCardEditor() {
 }
 
 function toggleCardLock(index) {
-    playClick();
-    syncCardsToConfig(currentEditingKey); // Capture any typed data before re-rendering
-    let targetCards = config.tests[currentEditingKey];
-    targetCards[index].locked = !targetCards[index].locked; // Toggle boolean
+    playClick(); syncCardsToConfig(currentEditingKey); 
+    config.tests[currentEditingKey][index].locked = !config.tests[currentEditingKey][index].locked; 
     renderCardEditor();
 }
 
@@ -959,32 +897,18 @@ function addManualWordRow(btnElem) {
 }
 
 function addQuestionCard() { 
-    playClick();
-    syncCardsToConfig(currentEditingKey); 
+    playClick(); syncCardsToConfig(currentEditingKey); 
     if(!config.tests[currentEditingKey]) config.tests[currentEditingKey] = [];
-    
-    // UNSHIFT adds the new card to the TOP of the array
-    config.tests[currentEditingKey].unshift({ 
-        p1Mode: "auto", sentence: "", manualWords: [], 
-        q1: "", q1opts: ["", "", "", ""], q1ans: 0, q1pts: 5, 
-        q2: "", q2opts: ["", "", "", ""], q2ans: 0, q2pts: 5,
-        locked: false // Unlocked by default so teacher can edit it immediately
-    }); 
+    config.tests[currentEditingKey].unshift({ p1Mode: "auto", sentence: "", manualWords: [], q1: "", q1opts: ["", "", "", ""], q1ans: 0, q1pts: 5, q2: "", q2opts: ["", "", "", ""], q2ans: 0, q2pts: 5, locked: false }); 
     renderCardEditor(); 
 }
 
 function deleteCard(idx) { 
-    if(confirm("Delete this card permanently?")) { 
-        syncCardsToConfig(currentEditingKey); 
-        config.tests[currentEditingKey].splice(idx, 1); 
-        renderCardEditor(); 
-    } 
+    if(confirm("Delete this card permanently?")) { syncCardsToConfig(currentEditingKey); config.tests[currentEditingKey].splice(idx, 1); renderCardEditor(); } 
 }
 
 function saveDashboard() {
     playClick();
-    config.activeSemester = document.getElementById('dash-active-semester').value;
-    config.activeGrade = document.getElementById('dash-active-grade').value;
     config.scriptUrl = document.getElementById('dash-script-url').value.trim();
     config.timerSeconds = parseInt(document.getElementById('dash-timer').value) || 70;
     config.fontFamily = document.getElementById('dash-font').value;
@@ -992,9 +916,7 @@ function saveDashboard() {
     syncDashboardToConfig(); 
     localStorage.setItem('oralTestConfig', JSON.stringify(config));
     
-    // Apply changes instantly
     document.body.style.setProperty('--main-font', config.fontFamily);
-    document.getElementById('display-test-info').innerText = `${config.activeSemester} | ${config.activeGrade}`;
     pool = []; 
     renderClassDropdown(); 
     document.getElementById('student-grid').innerHTML = ''; 
