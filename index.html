@@ -1,973 +1,479 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Sanxing English Village - Oral Test</title>
-<!-- Child-friendly Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&family=Patrick+Hand&family=Quicksand:wght@700&display=swap" rel="stylesheet">
-<style>
-    :root {
-        /* Sanxing Theme: Yellow & Blue */
-        --primary: #FFD166;       
-        --primary-dark: #FFB703;
-        --secondary: #0077B6;     
-        --secondary-dark: #023E8A;
-        --accent: #FF9F1C;
-        --accent-dark: #F77F00;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ESL Vocab Star - Smartboard Edition</title>
+    <style>
+        :root {
+            --primary: #4ECDC4;
+            --primary-dark: #2A9D8F;
+            --secondary: #FF6B6B;
+            --secondary-dark: #C44536;
+            --accent: #FFE66D;
+            --accent-dark: #F4A261;
+            --bg-color: #F7FFF7;
+            --text-dark: #1A535C;
+        }
+
+        /* MANDATORY SMARTBOARD OPTIMIZATIONS */
+        body { 
+            user-select: none; 
+            -webkit-user-select: none; 
+            touch-action: none; 
+            margin: 0; 
+            overflow: hidden; 
+            font-family: 'Century Gothic', 'AppleGothic', sans-serif;
+            font-weight: bold;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: var(--text-dark);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Allow typing in specific inputs */
+        input, select, textarea {
+            user-select: auto;
+            -webkit-user-select: auto;
+            touch-action: auto;
+            font-family: inherit;
+            font-weight: bold;
+        }
+
+        /* Screen Management */
+        .screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        .screen.active { display: flex; }
+
+        /* Aesthetics */
+        h1 { font-size: clamp(3rem, 6vw, 5rem); color: var(--secondary); text-shadow: 3px 3px 0px #fff, 5px 5px 0px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h2 { font-size: clamp(2rem, 4vw, 3rem); background: rgba(255,255,255,0.8); padding: 15px 30px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 30px; }
+
+        .form-input {
+            font-size: 1.8rem; padding: 15px 20px; border: 5px solid var(--primary);
+            border-radius: 20px; outline: none; text-align: center; margin-bottom: 20px;
+            color: var(--text-dark); box-shadow: 0 5px 0 rgba(0,0,0,0.1); width: 80%; max-width: 400px;
+        }
+
+        /* Large Forgiving Buttons */
+        .btn {
+            font-size: clamp(1.5rem, 3vw, 2.5rem); padding: 20px 40px; margin: 10px; border: none;
+            border-radius: 40px; background-color: var(--primary); color: white; cursor: pointer;
+            box-shadow: 0 8px 0px var(--primary-dark), 0 15px 20px rgba(0,0,0,0.2);
+            transition: transform 0.1s, box-shadow 0.1s; min-width: 250px; min-height: 80px;
+        }
+        .btn:active { transform: translateY(8px); box-shadow: 0 0px 0px var(--primary-dark), 0 5px 10px rgba(0,0,0,0.2); }
+        .btn.start { background-color: var(--secondary); box-shadow: 0 8px 0px var(--secondary-dark); font-size: 2.5rem; }
+        .btn.start:active { box-shadow: 0 0px 0px var(--secondary-dark); }
+
+        /* Game Elements */
+        #game-image {
+            max-height: 35vh; max-width: 90vw; border-radius: 20px; border: 8px solid white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15); margin-bottom: 20px; object-fit: contain; display: none; background: white;
+        }
+
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; max-width: 800px; }
+        .option-btn { background-color: var(--accent); color: var(--text-dark); box-shadow: 0 8px 0px var(--accent-dark); word-wrap: break-word; }
+        .option-btn:active { box-shadow: 0 0px 0px var(--accent-dark); }
+
+        /* HUD & Gear Icon */
+        .hud { position: absolute; top: 20px; left: 20px; font-size: 2rem; background: white; padding: 10px 25px; border-radius: 20px; color: var(--secondary); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        #gear-btn {
+            position: absolute; top: 20px; right: 20px; background: white; border: none; border-radius: 50%;
+            width: 60px; height: 60px; font-size: 30px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            z-index: 100; min-width: 44px; min-height: 44px; display: flex; justify-content: center; align-items: center;
+        }
+        #gear-btn:active { transform: scale(0.95); }
+
+        /* Dashboard */
+        #dashboard-modal {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(26, 83, 92, 0.98); color: white; z-index: 1000; padding: 20px;
+            overflow-y: auto; touch-action: auto; font-family: Arial, sans-serif; font-weight: normal; text-align: left;
+        }
+        .dash-container { max-width: 900px; margin: 0 auto; background: #2B2D42; padding: 30px; border-radius: 15px; }
+        .dash-container h1 { font-size: 2.5rem; text-shadow: none; color: white; margin-top:0; text-align:left;}
         
-        /* Game Colors */
-        --correct: #007A50; 
-        --correct-dark: #00593B;
-        --incorrect: #EF476F;
-        --incorrect-dark: #C1121F;
+        .dash-btn { padding: 12px 20px; font-size: 1.1rem; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; margin: 5px 5px 15px 0; background: var(--primary); color: white; }
+        .dash-btn.danger { background: var(--secondary); }
+        .dash-btn.save { background: #06D6A0; color: #111; font-size: 1.3rem; padding: 15px 30px; }
         
-        --text-dark: #1D3557;
-        --white: #FFFFFF;
-
-        /* Dynamic Font Variable */
-        --main-font: 'Century Gothic', 'AppleGothic', sans-serif;
-    }
-
-    /* MANDATORY SMARTBOARD OPTIMIZATION */
-    body {
-        font-family: var(--main-font);
-        font-weight: bold;
-        user-select: none; 
-        -webkit-user-select: none; 
-        touch-action: none; 
-        margin: 0; 
-        overflow: hidden; 
-        background: linear-gradient(135deg, #00A8E8 0%, #0077B6 100%);
-        color: var(--text-dark);
-        display: flex;
-        flex-direction: column;
-        height: 100vh;
-        width: 100vw;
-    }
-
-    #floating-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 0; pointer-events: none; }
-    .float-el {
-        position: absolute; bottom: -100px; color: rgba(255, 255, 255, 0.15);
-        font-weight: bold; font-size: 2rem; animation: floatUp linear infinite; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-    }
-    @keyframes floatUp { 0% { transform: translateY(0) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; } }
-
-    input, textarea, select { user-select: auto; -webkit-user-select: auto; touch-action: auto; font-family: var(--main-font); }
-
-    #top-bar {
-        flex: 0 0 auto; width: 100%; padding: 15px; display: none; justify-content: center; align-items: center; box-sizing: border-box;
-        background: var(--white); box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 10;
-    }
-    #timer-display {
-        font-size: 2.5rem; background: var(--white); color: var(--secondary); padding: 10px 40px; border-radius: 30px; 
-        border: 5px solid var(--primary); box-shadow: 0 4px 0 rgba(0,0,0,0.1);
-    }
-
-    .screen {
-        display: none; flex: 1 1 auto; overflow-y: auto; flex-direction: column; align-items: center; 
-        justify-content: flex-start; padding: 30px 20px; box-sizing: border-box; width: 100%; z-index: 1;
-    }
-    .screen.active { display: flex; }
-
-    .school-title { font-size: clamp(1.5rem, 3vw, 2.5rem); color: var(--primary); text-shadow: 2px 2px 0px var(--secondary-dark); margin-bottom: 0; text-transform: uppercase; letter-spacing: 2px;}
-    .main-title { font-size: clamp(3.5rem, 7vw, 5rem); text-align: center; color: var(--white); margin-top: 5px; margin-bottom: 20px; text-shadow: 4px 4px 0px var(--secondary-dark); }
-    .screen h2 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 20px; text-align: center; color: var(--white); text-shadow: 2px 2px 0px rgba(0,0,0,0.2); }
-    .test-info { font-size: 1.5rem; color: var(--secondary); margin-bottom: 30px; background: var(--primary); padding: 10px 30px; border-radius: 20px; box-shadow: 0 6px 0 var(--primary-dark); border: 3px solid white;}
-
-    .input-group { display: flex; flex-direction: row; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 800px; }
-
-    .game-input {
-        font-family: var(--main-font); font-weight: bold; font-size: 1.8rem; padding: 15px 20px; border: 5px solid var(--primary);
-        border-radius: 20px; outline: none; text-align: center; background-color: var(--white); color: var(--text-dark);
-        box-shadow: 0 6px 0 rgba(0,0,0,0.1); flex: 1; min-width: 250px; cursor: pointer;
-    }
-
-    /* Standard Game Buttons */
-    .game-btn {
-        font-family: var(--main-font); font-weight: bold; font-size: 2rem; padding: 20px 40px; margin: 15px 10px; border: none;
-        border-radius: 25px; background-color: var(--primary); color: var(--secondary-dark); cursor: pointer;
-        box-shadow: 0 8px 0 var(--primary-dark); transition: transform 0.1s, box-shadow 0.1s; min-width: 220px; min-height: 70px; text-transform: uppercase;
-    }
-    .game-btn:active { transform: translateY(8px); box-shadow: 0 0 0 var(--primary-dark); }
-    .game-btn.start-btn { background-color: var(--primary); font-size: 2.5rem; padding: 20px 60px; }
-    .game-btn.alt-btn { background-color: var(--accent); color: white; box-shadow: 0 8px 0 var(--accent-dark); }
-    .game-btn.alt-btn:active { box-shadow: 0 0 0 var(--accent-dark); }
-    .game-btn.submit-btn { background-color: var(--correct); color: white; box-shadow: 0 8px 0 var(--correct-dark); }
-    .game-btn.submit-btn:active { box-shadow: 0 0 0 var(--correct-dark); }
-    .game-btn.back-btn { background-color: #6C757D; color: white; box-shadow: 0 8px 0 #495057; font-size: 1.5rem; padding: 15px 30px;}
-    .game-btn.back-btn:active { box-shadow: 0 0 0 #495057; }
-
-    /* Clean Student Grid Elements */
-    #student-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-        gap: 12px; margin-top: 20px; width: 100%; max-width: 1000px;
-    }
-    .student-btn {
-        font-family: var(--main-font); 
-        font-weight: bold; 
-        font-size: 1.1rem; 
-        padding: 12px 15px; 
-        border: none;
-        border-radius: 12px; 
-        background-color: var(--white); 
-        color: var(--secondary-dark); 
-        cursor: pointer;
-        box-shadow: 0 4px 0 rgba(0,0,0,0.15); 
-        transition: transform 0.1s, box-shadow 0.1s, background-color 0.2s;
-        width: 100%; 
-        white-space: nowrap; 
-        overflow: hidden; 
-        text-overflow: ellipsis;
-        text-align: left; 
-    }
-    .student-btn:active { transform: translateY(4px); box-shadow: 0 0 0 rgba(0,0,0,0.15); }
-    .student-btn.completed {
-        background-color: #ADB5BD; color: #495057; box-shadow: 0 4px 0 #868E96; text-decoration: line-through; opacity: 0.7;
-    }
-    .student-btn.completed:active { transform: translateY(4px); box-shadow: 0 0 0 #868E96; }
-
-    /* Part 1 */
-    #sentence-container {
-        display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin: 20px 0 40px 0; max-width: 1200px; 
-        background: rgba(255,255,255,0.95); padding: 30px; border-radius: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-    }
-    .word-btn {
-        font-size: clamp(2rem, 4vw, 3rem); padding: 15px 25px; background-color: var(--correct); box-shadow: 0 8px 0 var(--correct-dark);
-        color: white; margin: 5px; min-height: auto; border:none; border-radius:15px; cursor: pointer; font-family: var(--main-font); font-weight: bold;
-    }
-    .word-btn.incorrect { background-color: var(--incorrect); box-shadow: 0 8px 0 var(--incorrect-dark); transform: scale(0.95) translateY(4px); opacity: 0.9; }
-
-    /* Part 2: 2x2 Grid */
-    .mcq-container { width: 100%; max-width: 900px; background: rgba(255,255,255,0.95); padding: 25px; border-radius: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); margin-bottom: 25px; }
-    .mcq-container h3 { margin: 0 0 15px 0; font-size: 1.8rem; color: var(--secondary-dark); }
-    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
-    .option-btn { font-family: var(--main-font); font-weight:bold; font-size: 1.5rem; padding: 20px; background-color: #EDF2F7; color: var(--text-dark); box-shadow: 0 6px 0 #CBD5E0; border:none; border-radius:15px; cursor:pointer; }
-    .option-btn.selected { background-color: var(--primary); box-shadow: 0 6px 0 var(--primary-dark); color: var(--secondary-dark); text-align: center; }
-
-    /* Gear Icon */
-    #gear-btn {
-        position: absolute; top: 20px; right: 20px; background: var(--white); box-shadow: 0 6px 0 rgba(0,0,0,0.2); padding: 10px; border-radius: 50%;
-        border: none; margin: 0; min-width: 60px; min-height: 60px; cursor: pointer; z-index: 100; display: flex; justify-content: center; align-items: center;
-    }
-    #gear-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,0.2); }
-    
-    /* DASHBOARD */
-    #dashboard-modal, #help-modal {
-        display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 62, 138, 0.98); z-index: 200; padding: 20px;
-        box-sizing: border-box; overflow-y: auto; color: white; font-family: Arial, sans-serif; font-weight: normal;
-    }
-    #help-modal { z-index: 300; background: rgba(20, 22, 35, 0.99); }
-    .dash-container { max-width: 900px; margin: 0 auto; background: #0077B6; padding: 30px; border-radius: 10px; border: 4px solid var(--primary); }
-    .dash-container h1 { font-size: 2rem; margin: 0 0 10px 0; color: white; }
-    .dash-container h2 { font-size: 1.5rem; margin: 0 0 15px 0; color: var(--primary); }
-    .dash-label { font-size: 0.9rem; margin-top: 10px; display: block; font-weight: bold; color: #FFF; }
-    .dash-input { 
-        width: 100%; font-size: 1rem; border-radius: 5px; padding: 8px 10px; margin-top: 5px; margin-bottom: 10px; 
-        border: 1px solid #023E8A; background: #CAF0F8; color: #023E8A; box-sizing: border-box; font-weight: bold;
-    }
-    .dash-input:focus { outline: 2px solid var(--primary); }
-    .q-card, .roster-card { background: #0096C7; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 8px solid var(--primary); }
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-    .dash-btn { padding: 10px 20px; font-size: 1rem; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; margin: 5px 5px 5px 0; }
-    .dash-btn.save { background: var(--correct); color: white; }
-    .dash-btn.action { background: var(--primary); color: var(--secondary-dark); }
-    .dash-btn.danger { background: var(--incorrect); color: white; }
-    .dash-btn.small { padding: 5px 10px; font-size: 0.85rem; }
-    .dash-btn.help-btn { background: var(--accent); color: white; }
-    hr { border: 0; border-top: 1px solid #CAF0F8; margin: 20px 0; opacity: 0.3; }
-
-    /* TABS CSS */
-    .dash-tabs { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 3px solid rgba(255,255,255,0.2); padding-bottom: 10px; overflow-x: auto; }
-    .dash-tab-btn { background: rgba(0,0,0,0.2); color: white; border: none; padding: 12px 25px; border-radius: 8px 8px 0 0; font-size: 1.1rem; cursor: pointer; font-weight: bold; white-space: nowrap; }
-    .dash-tab-btn:hover { background: rgba(0,0,0,0.3); }
-    .dash-tab-btn.active { background: var(--primary); color: var(--secondary-dark); }
-    .dash-tab-content { display: none; }
-    .dash-tab-content.active { display: block; animation: fadeIn 0.3s ease; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-    .help-list li { margin-bottom: 15px; font-size: 1.1rem; line-height: 1.5; }
-    .help-code { width: 100%; height: 300px; font-family: monospace; font-size: 0.9rem; background: #1A202C; color: #A0AEC0; padding: 15px; border-radius: 5px; border: 1px solid #4A5568; white-space: pre; }
-</style>
+        .dash-q-card { background: #3B3F58; padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid var(--primary); }
+        .dash-label { display: block; margin-top: 10px; font-weight: bold; font-size: 0.9rem; color: #A0AEC0; }
+        .dash-input { width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: none; font-size: 1.1rem; box-sizing: border-box; }
+        .img-preview { max-width: 150px; max-height: 100px; border-radius: 8px; margin-top: 10px; display: none; object-fit: contain; background: white; }
+    </style>
 </head>
 <body>
 
-    <!-- Animated Background -->
-    <div id="floating-bg"></div>
+    <button id="gear-btn" onclick="openDashboard()">⚙️</button>
+    <div id="score-hud" class="hud" style="display:none;">⭐ 0</div>
 
-    <button id="gear-btn" onclick="openDashboard()">
-        <svg width="30" height="30" viewBox="0 0 24 24" fill="var(--secondary-dark)">
-            <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
-        </svg>
-    </button>
-
-    <div id="top-bar"><div id="timer-display">01:10</div></div>
-
-    <!-- Start Screen -->
+    <!-- START SCREEN -->
     <div id="start-screen" class="screen active">
-        <h1 class="school-title">Sanxing English Village</h1>
-        <h1 class="main-title">Oral English Test</h1>
-        <div class="test-info" id="display-test-info">First Semester | Grade 1</div>
-        
-        <div class="input-group">
-            <select id="class-select" class="game-input" onchange="renderStudentGrid()">
-                <option value="">-- Select Class --</option>
-            </select>
-        </div>
-        
-        <!-- Interactive Roster Grid -->
-        <div id="student-grid"></div>
+        <h1>ESL Vocab Star</h1>
+        <h2>Enter your name to begin!</h2>
+        <input type="text" id="student-name" class="form-input" placeholder="Student Name" autocomplete="off">
+        <button class="btn start" onclick="startGame()">START</button>
     </div>
 
-    <!-- Part 1 Screen -->
-    <div id="part1-screen" class="screen">
-        <div style="display:flex; justify-content:space-between; width:100%; max-width:1200px; align-items:center;">
-            <button class="game-btn back-btn" onclick="cancelTest()">🔙 Back</button>
-            <h2 style="margin:0; text-align:center; flex-grow:1;">Part 1: Read Aloud 📖</h2>
-            <div style="width: 140px;"></div>
+    <!-- GAME SCREEN -->
+    <div id="game-screen" class="screen">
+        <img id="game-image" src="" alt="Vocab Image">
+        <h2 id="question-text">What is this?</h2>
+        <div class="options-grid" id="options-container">
+            <!-- Buttons injected here -->
         </div>
-        
-        <p style="color:var(--primary); font-size:1.5rem; margin-top:10px;">Teacher: Tap words the student misses.</p>
-        <div id="sentence-container"></div>
-        <button class="game-btn alt-btn" onclick="goToPart2()">Next: Part 2 ➔</button>
     </div>
 
-    <!-- Part 2 Screen -->
-    <div id="part2-screen" class="screen">
-        <h2>Part 2: Multiple Choice ❓</h2>
-        <div id="mcq1" class="mcq-container">
-            <h3 id="q1-text">Question 1</h3>
-            <div class="options-grid" id="q1-options"></div>
-        </div>
-        <div id="mcq2" class="mcq-container">
-            <h3 id="q2-text">Question 2</h3>
-            <div class="options-grid" id="q2-options"></div>
-        </div>
-        <button class="game-btn submit-btn" onclick="finishTest()">Finish & Submit ✅</button>
+    <!-- END SCREEN -->
+    <div id="end-screen" class="screen">
+        <h1>Great Job! 🎉</h1>
+        <h2 id="final-score">You scored X!</h2>
+        <button class="btn start" onclick="resetGame()">Play Again</button>
     </div>
 
-    <!-- Result Screen -->
-    <div id="result-screen" class="screen">
-        <h1 style="color:var(--primary);">🎉 Test Complete! 🎉</h1>
-        <h2 id="final-score-display" style="font-size: clamp(2.5rem, 5vw, 4rem); color: var(--secondary-dark); background: white; padding: 20px 40px; border-radius: 20px; box-shadow: 0 8px 0 rgba(0,0,0,0.2); text-shadow:none;">Total Score: 0</h2>
-        <p id="score-breakdown" style="font-size: 1.5rem; text-align: center; line-height: 1.8; background: white; color: var(--text-dark); padding: 20px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 8px 0 rgba(0,0,0,0.2); width: 100%; max-width: 800px; font-weight:bold;"></p>
-        
-        <button id="submit-btn" class="game-btn submit-btn" onclick="submitToDrive()">Save to Google Drive ☁️</button>
-        <button class="game-btn alt-btn" onclick="resetGame()">Next Student ➔</button>
-    </div>
-
-    <!-- Teacher Dashboard Modal -->
+    <!-- TEACHER DASHBOARD -->
     <div id="dashboard-modal">
         <div class="dash-container">
-            <h1>⚙️ Teacher Dashboard</h1>
+            <h1>Teacher Dashboard</h1>
+            <p style="color: #A0AEC0;">Questions are automatically randomized for each student.</p>
             
-            <!-- Dashboard Tabs Navigation -->
-            <div class="dash-tabs">
-                <button class="dash-tab-btn active" onclick="openDashTab('tab-general')">⚙️ General Settings</button>
-                <button class="dash-tab-btn" onclick="openDashTab('tab-rosters')">👥 Class Rosters</button>
-                <button class="dash-tab-btn" onclick="openDashTab('tab-cards')">📝 Test Cards</button>
-                <button class="dash-tab-btn" onclick="openDashTab('tab-backup')">💾 Backup / Restore</button>
+            <div>
+                <button class="dash-btn" onclick="addQuestion()">➕ Add Question</button>
+                <button class="dash-btn" style="background:#FFE66D; color:#111;" onclick="exportJSON()">💾 Export JSON</button>
+                <button class="dash-btn" style="background:#FFE66D; color:#111;" onclick="document.getElementById('import-file').click()">📂 Import JSON</button>
+                <input type="file" id="import-file" style="display:none;" accept=".json" onchange="importJSON(event)">
             </div>
 
-            <!-- TAB 1: General Settings -->
-            <div id="tab-general" class="dash-tab-content active">
-                <div style="background: rgba(0,0,0,0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                    <h2 style="margin-top:0; color:white;">Active Test Assignment</h2>
-                    <p style="color:#CAF0F8; margin-bottom:15px;">Which test are the students taking right now?</p>
-                    <div class="grid-2">
-                        <div>
-                            <label class="dash-label">Active Semester:</label>
-                            <select id="dash-active-semester" class="dash-input">
-                                <option value="First Semester">First Semester</option>
-                                <option value="Second Semester">Second Semester</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="dash-label">Active Grade Level:</label>
-                            <select id="dash-active-grade" class="dash-input">
-                                <option value="Grade 1">Grade 1</option>
-                                <option value="Grade 2">Grade 2</option>
-                                <option value="Grade 3">Grade 3</option>
-                                <option value="Grade 4">Grade 4</option>
-                                <option value="Grade 5">Grade 5</option>
-                                <option value="Grade 6">Grade 6</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <hr>
-                    <h2 style="margin-top:0; color:white;">Global Settings</h2>
-                    <div class="grid-2" style="margin-top: 10px;">
-                        <div>
-                            <label class="dash-label">Timer Duration (Seconds):</label>
-                            <input type="number" id="dash-timer" class="dash-input">
-                        </div>
-                        <div>
-                            <label class="dash-label">Game Font Style:</label>
-                            <select id="dash-font" class="dash-input">
-                                <option value="'Century Gothic', 'AppleGothic', sans-serif">Century Gothic (Default)</option>
-                                <option value="'Nunito', sans-serif">Nunito (Friendly & Round)</option>
-                                <option value="'Quicksand', sans-serif">Quicksand (Clean & Soft)</option>
-                                <option value="'Patrick Hand', cursive">Patrick Hand (Handwritten)</option>
-                                <option value="'Comic Sans MS', 'Chalkboard SE', sans-serif">Comic Sans (Classic)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <label class="dash-label" style="margin-top:20px;">Google Script Web App URL (For saving data):</label>
-                    <input type="text" id="dash-script-url" class="dash-input" placeholder="https://script.google.com/macros/s/...">
-                    <button class="dash-btn help-btn" onclick="openHelpModal()">❓ Need Help Setting Up Google Drive?</button>
-                </div>
+            <div id="editor-container">
+                <!-- Editor Cards injected here -->
             </div>
 
-            <!-- TAB 2: Class Rosters -->
-            <div id="tab-rosters" class="dash-tab-content">
-                <div style="background: rgba(0,0,0,0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                    <button class="dash-btn action small" onclick="addRosterCard()">➕ Add Class Roster</button>
-                    <p style="color:white; font-size:0.9rem;">Add a class block, name it, and paste the students below it. They will automatically appear as buttons on the home screen!</p>
-                    <div id="roster-container"></div>
-                </div>
+            <div style="margin-top: 30px; border-top: 2px solid #555; padding-top: 20px;">
+                <button class="dash-btn save" onclick="saveDashboard()">Save Settings ✅</button>
+                <button class="dash-btn danger" onclick="closeDashboard()">Cancel ❌</button>
             </div>
-
-            <!-- TAB 3: Test Cards -->
-            <div id="tab-cards" class="dash-tab-content">
-                
-                <div style="background: rgba(0,0,0,0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 2px solid var(--accent);">
-                    <h2 style="margin-top:0; color:white;">Select Test Bank to Edit</h2>
-                    <p style="color:#CAF0F8;">You are currently editing the cards for:</p>
-                    <div class="grid-2">
-                        <select id="editor-semester" class="dash-input" onchange="changeEditTarget()"></select>
-                        <select id="editor-grade" class="dash-input" onchange="changeEditTarget()"></select>
-                    </div>
-                </div>
-
-                <div style="margin-bottom: 20px;">
-                    <button class="dash-btn action" onclick="addQuestionCard()">➕ Add New Test Card</button>
-                </div>
-                <div id="editor-container"></div>
-            </div>
-
-            <!-- TAB 4: Backup / Restore -->
-            <div id="tab-backup" class="dash-tab-content">
-                <div style="background: rgba(0,0,0,0.1); padding: 25px; border-radius: 8px; text-align: center;">
-                    <h2 style="color: white; margin-top:0;">Save or Load Your Setup</h2>
-                    <p style="color: white;">Moving to a new computer? Export your data here and import it on the new machine so you don't lose your questions or rosters!</p>
-                    <button class="dash-btn action" style="font-size: 1.5rem; padding: 15px 30px;" onclick="exportData()">💾 Export Data (Backup)</button>
-                    <button class="dash-btn help-btn" style="font-size: 1.5rem; padding: 15px 30px;" onclick="document.getElementById('import-file').click()">📂 Import Backup File</button>
-                    <input type="file" id="import-file" style="display:none;" accept=".json" onchange="importData(event)">
-                </div>
-            </div>
-
-            <!-- Global Action Buttons -->
-            <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #CAF0F8;">
-                <button class="dash-btn save" style="font-size: 1.2rem; padding: 15px 30px;" onclick="saveDashboard()">Save Settings ✅</button>
-                <button class="dash-btn danger" style="font-size: 1.2rem; padding: 15px 30px;" onclick="closeDashboard()">Cancel ❌</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Help Modal -->
-    <div id="help-modal">
-        <div class="dash-container" style="background:#1A202C; border-color:#4A5568;">
-            <h1 style="color:var(--primary);">📄 Google Drive Setup Guide</h1>
-            <p style="color:white;">Follow these exact steps to connect this game to your Google Drive.</p>
-            <ol class="help-list">
-                <li>Go to Google Drive and create a specific folder where you want to save your results.</li>
-                <li>Copy the <b>Folder ID</b> from the URL bar (the text after <code>folders/</code>).</li>
-                <li>Create a new Google Sheet inside that folder.</li>
-                <li>Click <b>Extensions > Apps Script</b>.</li>
-                <li>Delete code, paste code below, replace <code>YOUR_FOLDER_ID_HERE</code> with actual Folder ID.</li>
-            </ol>
-            <textarea class="help-code" readonly>
-const PARENT_FOLDER_ID = "YOUR_FOLDER_ID_HERE";
-
-function doPost(e) {
-  var data;
-  try { data = JSON.parse(e.postData.contents); } catch(error) { return ContentService.createTextOutput("Error parsing JSON").setMimeType(ContentService.MimeType.TEXT); }
-
-  var semesterName = data.semester || "Unknown Semester";
-  var gradeName = data.grade || "Unknown Grade";
-  var className = data.className || "Unknown Class";
-  var timestamp = new Date();
-  
-  var sheetName = gradeName + " " + className + " - Results";
-
-  var parentFolder = DriveApp.getFolderById(PARENT_FOLDER_ID);
-  var semFolders = parentFolder.getFoldersByName(semesterName);
-  var semFolder = semFolders.hasNext() ? semFolders.next() : parentFolder.createFolder(semesterName);
-
-  var gradeFolders = semFolder.getFoldersByName(gradeName);
-  var gradeFolder = gradeFolders.hasNext() ? gradeFolders.next() : semFolder.createFolder(gradeName);
-
-  var classFolders = gradeFolder.getFoldersByName(className);
-  var classFolder = classFolders.hasNext() ? classFolders.next() : gradeFolder.createFolder(className);
-
-  var files = classFolder.getFilesByName(sheetName);
-  var spreadsheet;
-  if (files.hasNext()) {
-    spreadsheet = SpreadsheetApp.openById(files.next().getId());
-  } else {
-    spreadsheet = SpreadsheetApp.create(sheetName);
-    DriveApp.getFileById(spreadsheet.getId()).moveTo(classFolder);
-    var sheet = spreadsheet.getActiveSheet();
-    sheet.appendRow(["Date/Time", "Student Name", "Total Score (30)", "Reading Score", "Missed Words", "Q1 Score", "Q2 Score"]);
-    sheet.getRange("A1:G1").setFontWeight("bold").setBackground("#FFD166");
-    sheet.setColumnWidth(5, 400); 
-  }
-
-  spreadsheet.getActiveSheet().appendRow([timestamp, data.studentName, data.totalScore, data.readingScore, data.missedWords, data.q1Score, data.q2Score]);
-  return ContentService.createTextOutput(JSON.stringify({"status": "success"})).setMimeType(ContentService.MimeType.JSON);
-}
-            </textarea>
-            <ol class="help-list" start="6">
-                <li>Click <b>Deploy > New deployment</b>. Type: <b>Web app</b>.</li>
-                <li>Execute as: <b>Me</b>. Who has access: <b>Anyone</b>.</li>
-                <li>Click <b>Deploy</b>. Authorize permissions. Copy the <b>Web app URL</b> into the Dashboard.</li>
-            </ol>
-            <button class="dash-btn danger" style="font-size: 1.2rem; padding: 15px 30px; width: 100%;" onclick="closeHelpModal()">Close Help Guide</button>
         </div>
     </div>
 
 <script>
-// --- Background Animation ---
-window.onload = () => {
-    const bg = document.getElementById('floating-bg');
-    const elements = ['A', 'B', 'C', '1', '2', '3', 'Dog', 'Cat', 'Hello', '★', '🎵', '?', 'Apple', 'Red', 'Yes', 'No'];
-    for(let i=0; i<25; i++) {
-        let el = document.createElement('div'); el.className = 'float-el';
-        el.innerText = elements[Math.floor(Math.random() * elements.length)];
-        el.style.left = Math.random() * 95 + 'vw'; el.style.animationDuration = (Math.random() * 15 + 10) + 's';
-        el.style.animationDelay = (Math.random() * 5) + 's'; el.style.fontSize = (Math.random() * 3 + 1.5) + 'rem';
-        bg.appendChild(el);
-    }
-};
-
-// --- Audio Engine ---
+// =========================================================
+// AUDIO ENGINE (Web Audio API - Offline Fallback)
+// =========================================================
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 let audioCtx = null;
-function initAudio() { if (!audioCtx) audioCtx = new AudioContext(); if (audioCtx.state === 'suspended') audioCtx.resume(); }
-function playTone(freq, type, duration, vol=0.1) {
-    if(!audioCtx) return; const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-    osc.type = type; osc.frequency.value = freq; osc.connect(gain); gain.connect(audioCtx.destination);
-    osc.start(); gain.gain.setValueAtTime(vol, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration); osc.stop(audioCtx.currentTime + duration);
+
+function initAudio() {
+    if (!audioCtx) audioCtx = new AudioContext();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
 }
-const playClick = () => { initAudio(); playTone(600, 'sine', 0.1); }
-const playSelect = () => { initAudio(); playTone(800, 'triangle', 0.15); }
-const playSuccess = () => { initAudio(); playTone(400, 'sine', 0.1); setTimeout(()=>playTone(600, 'sine', 0.2), 100); setTimeout(()=>playTone(800, 'sine', 0.3), 200);}
-const playWarning = () => { initAudio(); playTone(300, 'sawtooth', 0.3); }
 
-// --- Game Data & Configuration ---
-const DEFAULT_URL = "https://script.google.com/macros/s/AKfycbwe8u9jinO3KHPTvQy_y1pW8gMeIg9Yk6Qv4ReuC92GFBFJkBw14ZiXfnlWMO6t_rUo/exec";
+function playTone(freq, type, duration, vol=0.1) {
+    if(!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type; osc.frequency.value = freq;
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start();
+    gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
+    osc.stop(audioCtx.currentTime + duration);
+}
 
-// Constants for Dropdowns
-const SEMESTERS = ["First Semester", "Second Semester"];
-const GRADES = ["Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5", "Grade 6"];
-
-// Default Config Structure
-const defaultConfig = {
-    activeSemester: "First Semester", 
-    activeGrade: "Grade 1", 
-    scriptUrl: DEFAULT_URL, 
-    timerSeconds: 70, 
-    fontFamily: "'Century Gothic', 'AppleGothic', sans-serif",
-    roster: [
-        { className: "3A", students: ["John Doe", "Jane Smith", "Emily Chen", "Michael Wu"] },
-        { className: "10B", students: ["Peter Parker", "Bruce Wayne"] }
-    ],
-    // The new specific question banks structure
-    tests: {
-        "First Semester_Grade 1": [
-            {
-                p1Mode: "auto", sentence: "The quick brown fox jumps over the lazy dog.", manualWords: [], 
-                q1: "What animal jumped?", q1opts: ["A dog", "A fox", "A cat", "A rabbit"], q1ans: 1, q1pts: 5,
-                q2: "What color was the fox?", q2opts: ["Red", "Brown", "Black", "White"], q2ans: 1, q2pts: 5
-            }
-        ]
-    }
+const sfx = {
+    click: () => { initAudio(); playTone(600, 'sine', 0.1); },
+    correct: () => { initAudio(); playTone(400, 'sine', 0.1); setTimeout(()=>playTone(600, 'sine', 0.15), 100); setTimeout(()=>playTone(800, 'sine', 0.2), 200); },
+    wrong: () => { initAudio(); playTone(300, 'sawtooth', 0.3); setTimeout(()=>playTone(250, 'sawtooth', 0.4), 150); }
 };
 
-let config = JSON.parse(localStorage.getItem('oralTestConfig')) || defaultConfig;
+// =========================================================
+// GAME DATA & STATE
+// =========================================================
+// Default fallback SVG images (works 100% offline)
+const defaultSVGApple = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='55' r='40' fill='%23FF6B6B'/><path d='M50 15 Q60 5 70 15' stroke='%232A9D8F' stroke-width='5' fill='none'/></svg>";
+const defaultSVGDog = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%23F4A261'/><circle cx='35' cy='40' r='5' fill='black'/><circle cx='65' cy='40' r='5' fill='black'/><path d='M40 60 Q50 70 60 60' stroke='black' stroke-width='4' fill='none'/></svg>";
 
-// Data Migration Script (If loading old JSON format, move it to the new structure)
-if(config.cards && !config.tests) {
-    config.tests = {};
-    let fallbackKey = (config.semester || "First Semester") + "_" + (config.grade || "Grade 1");
-    config.tests[fallbackKey] = config.cards;
-    delete config.cards; // Clean up old structure
-    
-    // Set active states if they don't exist
-    if(!config.activeSemester) config.activeSemester = config.semester || "First Semester";
-    if(!config.activeGrade) config.activeGrade = config.grade || "Grade 1";
-}
+const defaultConfig = {
+    questions: [
+        { q: "What is this?", img: defaultSVGApple, correct: "Apple", wrongs: ["Banana", "Orange", "Grape"] },
+        { q: "What animal is this?", img: defaultSVGDog, correct: "Dog", wrongs: ["Cat", "Bird", "Fish"] }
+    ]
+};
 
-let pool = [];
-let completedStudents = {}; 
-let currentEditingKey = ""; // Tracks which test bank is open in the editor
+let config = JSON.parse(localStorage.getItem('vocabQuizDB')) || defaultConfig;
+let drawPile = []; // The randomized deck of questions
+let currentScore = 0;
+let currentQuestion = null;
 
-// Initialize App
-document.body.style.setProperty('--main-font', config.fontFamily || "'Century Gothic', 'AppleGothic', sans-serif");
-document.getElementById('display-test-info').innerText = `${config.activeSemester} | ${config.activeGrade}`;
-renderClassDropdown();
-
-function renderClassDropdown() {
-    const classSel = document.getElementById('class-select');
-    classSel.innerHTML = '<option value="">-- Select Class --</option>';
-    if(config.roster && config.roster.length > 0) {
-        let sortedRoster = [...config.roster].sort((a, b) => {
-            return a.className.localeCompare(b.className, undefined, { numeric: true, sensitivity: 'base' });
-        });
-        sortedRoster.forEach(r => {
-            let opt = document.createElement('option');
-            opt.value = r.className; opt.innerText = r.className;
-            classSel.appendChild(opt);
-        });
-    }
-}
-
-function renderStudentGrid() {
-    const classVal = document.getElementById('class-select').value;
-    const grid = document.getElementById('student-grid');
-    grid.innerHTML = '';
-    if(!classVal) return;
-    
-    const targetClass = config.roster.find(r => r.className === classVal);
-    if(targetClass && targetClass.students) {
-        if(!completedStudents[classVal]) completedStudents[classVal] = [];
-        targetClass.students.forEach(name => {
-            let btn = document.createElement('button');
-            btn.className = 'student-btn'; btn.innerText = name;
-            if(completedStudents[classVal].includes(name)) btn.classList.add('completed');
-            btn.onclick = () => startTest(classVal, name);
-            grid.appendChild(btn);
-        });
-    }
-}
-
-// --- State Variables ---
-let currentClass = ""; let currentStudent = "";
-let activeCard = null; let timerInt = null; let timeLeft = config.timerSeconds || 70;
-let part1Score = 0; let part1Max = 20; let q1Score = 0; let q2Score = 0; let missedWordsArr = [];
-
+// =========================================================
+// FISHER-YATES SHUFFLE ALGORITHM
+// =========================================================
 function shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; }
-}
-
-function getNextCard() {
-    if (pool.length === 0) { 
-        // Pull ONLY the cards for the active semester & grade
-        let key = config.activeSemester + "_" + config.activeGrade;
-        let testBank = config.tests[key] || [];
-        pool = JSON.parse(JSON.stringify(testBank)); 
-        shuffle(pool); 
+    let currentIndex = array.length, randomIndex;
+    while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
     }
-    return pool.pop();
+    return array;
 }
 
+// =========================================================
+// CORE GAME LOGIC
+// =========================================================
 function switchScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    document.getElementById(id).scrollTop = 0; 
 }
 
-function startTest(className, studentName) {
-    playClick();
-    currentClass = className; currentStudent = studentName;
+function startGame() {
+    sfx.click();
+    const studentName = document.getElementById('student-name').value.trim();
+    if(!studentName) return alert("Please enter your name first!");
+    if(config.questions.length === 0) return alert("Teacher: Please add questions in the Dashboard!");
     
-    let key = config.activeSemester + "_" + config.activeGrade;
-    if(!config.tests[key] || config.tests[key].length === 0) {
-        return alert("Teacher: There are no questions for this Semester/Grade yet. Please add them in the Dashboard!");
-    }
+    currentScore = 0;
+    document.getElementById('score-hud').innerText = `⭐ ${currentScore}`;
+    document.getElementById('score-hud').style.display = 'block';
     
-    activeCard = getNextCard();
-    setupPart1(); setupPart2();
-    switchScreen('part1-screen'); startTimer();
-}
-
-function cancelTest() {
-    playClick(); stopTimer(); switchScreen('start-screen'); renderStudentGrid(); 
-}
-
-function startTimer() {
-    timeLeft = config.timerSeconds || 70;
-    document.getElementById('top-bar').style.display = 'flex'; updateTimerUI();
-    timerInt = setInterval(() => {
-        timeLeft--; updateTimerUI();
-        if(timeLeft <= 10 && timeLeft > 0) playWarning();
-        if (timeLeft <= 0) { clearInterval(timerInt); finishTest(); }
-    }, 1000);
-}
-
-function updateTimerUI() {
-    let m = Math.floor(Math.max(0, timeLeft) / 60).toString().padStart(2, '0');
-    let s = (Math.max(0, timeLeft) % 60).toString().padStart(2, '0');
-    let display = document.getElementById('timer-display');
-    display.innerText = `${m}:${s}`;
-    if(timeLeft <= 10) { display.style.color = "var(--incorrect)"; display.style.borderColor = "var(--incorrect)"; } 
-    else { display.style.color = "var(--secondary)"; display.style.borderColor = "var(--primary)"; }
-}
-function stopTimer() { clearInterval(timerInt); document.getElementById('top-bar').style.display = 'none'; }
-
-function setupPart1() {
-    const container = document.getElementById('sentence-container'); container.innerHTML = ""; missedWordsArr = [];
-    if (activeCard.p1Mode === 'manual') {
-        part1Max = activeCard.manualWords.reduce((sum, w) => sum + parseInt(w.pts), 0);
-        activeCard.manualWords.forEach(wObj => {
-            if(!wObj.word) return;
-            let btn = document.createElement('button'); btn.className = "word-btn"; btn.innerText = wObj.word; btn.dataset.pts = wObj.pts;
-            btn.onclick = () => { playClick(); btn.classList.toggle('incorrect'); }; container.appendChild(btn);
-        });
-    } else {
-        part1Max = 20; 
-        activeCard.sentence.split(" ").forEach(w => {
-            if(w.trim() === "") return;
-            let btn = document.createElement('button'); btn.className = "word-btn"; btn.innerText = w;
-            btn.onclick = () => { playClick(); btn.classList.toggle('incorrect'); }; container.appendChild(btn);
-        });
-    }
-}
-
-function calculatePart1Score() {
-    let btns = document.querySelectorAll('.word-btn');
-    let correctCount = 0; let tempManualScore = 0; missedWordsArr = [];
-    if(btns.length === 0) return;
-    btns.forEach(btn => {
-        if(btn.classList.contains('incorrect')) { missedWordsArr.push(btn.innerText.replace(/[.,!?]/g, '')); } 
-        else { correctCount++; if(activeCard.p1Mode === 'manual') tempManualScore += parseInt(btn.dataset.pts || 0); }
-    });
-    part1Score = activeCard.p1Mode === 'manual' ? tempManualScore : Math.round((correctCount / btns.length) * part1Max);
-}
-
-function goToPart2() { playClick(); calculatePart1Score(); switchScreen('part2-screen'); }
-
-function setupPart2() {
-    q1Score = 0; q2Score = 0;
-    renderMCQ('q1', activeCard.q1, activeCard.q1opts, 1);
-    renderMCQ('q2', activeCard.q2, activeCard.q2opts, 2);
-}
-
-function renderMCQ(prefix, question, options, qNum) {
-    document.getElementById(`${prefix}-text`).innerText = `${qNum}. ${question} (${activeCard[prefix+'pts']} pts)`;
-    const grid = document.getElementById(`${prefix}-options`); grid.innerHTML = "";
-    options.forEach((opt, idx) => {
-        let btn = document.createElement('button'); btn.className = "option-btn"; btn.innerText = opt;
-        btn.onclick = () => selectOption(prefix, btn, idx); grid.appendChild(btn);
-    });
-}
-
-function selectOption(prefix, btn, idx) {
-    playSelect(); const grid = document.getElementById(`${prefix}-options`);
-    Array.from(grid.children).forEach(c => c.classList.remove('selected')); btn.classList.add('selected');
-    if (prefix === 'q1') q1Score = (idx === parseInt(activeCard.q1ans)) ? parseInt(activeCard.q1pts) : 0;
-    if (prefix === 'q2') q2Score = (idx === parseInt(activeCard.q2ans)) ? parseInt(activeCard.q2pts) : 0;
-}
-
-function finishTest() {
-    playSuccess(); stopTimer();
-    if(document.getElementById('part1-screen').classList.contains('active')) calculatePart1Score();
-    let totalScore = part1Score + q1Score + q2Score;
-    let maximumPossible = part1Max + parseInt(activeCard.q1pts) + parseInt(activeCard.q2pts);
-    document.getElementById('final-score-display').innerText = `Total Score: ${totalScore} / ${maximumPossible}`;
-    let missedText = missedWordsArr.length > 0 ? `<br><span style="color:var(--incorrect)">Missed Words: ${missedWordsArr.join(', ')}</span>` : '<br><span style="color:var(--correct)">Perfect Reading! 🎉</span>';
-    document.getElementById('score-breakdown').innerHTML = `Reading: <b>${part1Score}/${part1Max}</b> &nbsp;|&nbsp; Q1: <b>${q1Score}/${activeCard.q1pts}</b> &nbsp;|&nbsp; Q2: <b>${q2Score}/${activeCard.q2pts}</b> ${missedText}`;
+    // FIX #2: Random Distribution & Exhaustion
+    // Create a fresh shuffled copy of the questions array for this student
+    drawPile = shuffle(JSON.parse(JSON.stringify(config.questions))); 
     
-    if(!completedStudents[currentClass].includes(currentStudent)) completedStudents[currentClass].push(currentStudent);
-    
-    let btn = document.getElementById('submit-btn');
-    btn.innerText = "Save to Google Drive ☁️"; btn.disabled = false; btn.style.backgroundColor = "var(--correct)";
-    switchScreen('result-screen');
+    switchScreen('game-screen');
+    nextQuestion();
 }
 
-function submitToDrive() {
-    playClick();
-    if(!config.scriptUrl) return alert("Teacher: Set the Google Script URL in Dashboard!");
-    const btn = document.getElementById('submit-btn'); btn.innerText = "Saving to Drive... ⏳"; btn.disabled = true;
-    const payload = {
-        semester: config.activeSemester, grade: config.activeGrade, className: currentClass, studentName: currentStudent,
-        totalScore: part1Score + q1Score + q2Score, readingScore: part1Score, q1Score: q1Score, q2Score: q2Score, missedWords: missedWordsArr.join(", ") || "None"
-    };
-
-    fetch(config.scriptUrl, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
-    .then(() => { btn.innerText = "Saved Successfully! ✅"; btn.style.backgroundColor = "var(--primary)"; playSuccess(); })
-    .catch(err => { btn.innerText = "Error Saving ❌"; btn.disabled = false; alert("Failed to save."); });
-}
-
-function resetGame() { playClick(); switchScreen('start-screen'); renderStudentGrid(); }
-
-// ==========================================
-// TEACHER DASHBOARD GUI (TABBED + SCOPED CARDS)
-// ==========================================
-
-function populateEditorDropdowns() {
-    const semSel = document.getElementById('editor-semester');
-    const grdSel = document.getElementById('editor-grade');
-    semSel.innerHTML = ''; grdSel.innerHTML = '';
-    
-    SEMESTERS.forEach(s => { let o = document.createElement('option'); o.value = s; o.innerText = s; semSel.appendChild(o); });
-    GRADES.forEach(g => { let o = document.createElement('option'); o.value = g; o.innerText = g; grdSel.appendChild(o); });
-}
-
-function openDashboard() {
-    playSelect(); document.getElementById('dashboard-modal').style.display = 'block';
-    
-    // Load Settings to UI
-    document.getElementById('dash-active-semester').value = config.activeSemester;
-    document.getElementById('dash-active-grade').value = config.activeGrade;
-    document.getElementById('dash-script-url').value = config.scriptUrl;
-    document.getElementById('dash-timer').value = config.timerSeconds;
-    document.getElementById('dash-font').value = config.fontFamily;
-    
-    renderRosterEditor(); 
-    
-    // Init Card Editor Dropdowns
-    populateEditorDropdowns();
-    document.getElementById('editor-semester').value = config.activeSemester;
-    document.getElementById('editor-grade').value = config.activeGrade;
-    currentEditingKey = config.activeSemester + "_" + config.activeGrade;
-    
-    renderCardEditor(); 
-    openDashTab('tab-general'); // default tab
-}
-
-function closeDashboard() { playClick(); document.getElementById('dashboard-modal').style.display = 'none'; }
-function openHelpModal() { playClick(); document.getElementById('help-modal').style.display = 'block'; }
-function closeHelpModal() { playClick(); document.getElementById('help-modal').style.display = 'none'; }
-
-function openDashTab(tabId) {
-    playClick();
-    document.querySelectorAll('.dash-tab-content').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.dash-tab-btn').forEach(el => el.classList.remove('active'));
-    document.getElementById(tabId).classList.add('active');
-    event.currentTarget.classList.add('active');
-}
-
-function syncDashboardToConfig() {
-    // 1. Sync Rosters
-    let newRoster = [];
-    document.querySelectorAll('.roster-card').forEach(rc => {
-        let cName = rc.querySelector('.r-class').value.trim();
-        let sList = rc.querySelector('.r-students').value.split('\n').map(s => s.trim()).filter(s => s !== "");
-        if(cName) newRoster.push({ className: cName, students: sList });
-    });
-    config.roster = newRoster;
-
-    // 2. Sync Editor Cards to current target key
-    syncCardsToConfig(currentEditingKey);
-}
-
-// Safely extracts the DOM cards and saves them to the specified test key
-function syncCardsToConfig(key) {
-    if(!key) return;
-    let newCards = [];
-    document.querySelectorAll('#editor-container .q-card').forEach(cardDom => {
-        let p1Mode = cardDom.querySelector('.c-p1mode').value;
-        let manualWords = [];
-        cardDom.querySelectorAll('.manual-word-row').forEach(row => {
-            let w = row.querySelector('.c-mw-word').value.trim(); let p = row.querySelector('.c-mw-pts').value;
-            if(w) manualWords.push({ word: w, pts: p });
-        });
-        newCards.push({
-            p1Mode: p1Mode, sentence: cardDom.querySelector('.c-sent').value, manualWords: manualWords,
-            q1: cardDom.querySelector('.c-q1').value, q1opts: [cardDom.querySelector('.c-q1o0').value, cardDom.querySelector('.c-q1o1').value, cardDom.querySelector('.c-q1o2').value, cardDom.querySelector('.c-q1o3').value], q1ans: parseInt(cardDom.querySelector('.c-q1ans').value), q1pts: parseInt(cardDom.querySelector('.c-q1pts').value) || 0,
-            q2: cardDom.querySelector('.c-q2').value, q2opts: [cardDom.querySelector('.c-q2o0').value, cardDom.querySelector('.c-q2o1').value, cardDom.querySelector('.c-q2o2').value, cardDom.querySelector('.c-q2o3').value], q2ans: parseInt(cardDom.querySelector('.c-q2ans').value), q2pts: parseInt(cardDom.querySelector('.c-q2pts').value) || 0
-        });
-    });
-    
-    if(!config.tests) config.tests = {};
-    config.tests[key] = newCards;
-}
-
-// Roster Functions
-function renderRosterEditor() {
-    const container = document.getElementById('roster-container'); container.innerHTML = '';
-    if(!config.roster) config.roster = [];
-    config.roster.forEach((r, idx) => {
-        let div = document.createElement('div'); div.className = 'roster-card';
-        div.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <input type="text" class="dash-input r-class" value="${r.className}" placeholder="Class Name (e.g. 3A)" style="max-width:200px; margin:0;">
-                <button class="dash-btn danger small" onclick="this.parentElement.parentElement.remove()">🗑️ Delete Class</button>
-            </div>
-            <textarea class="dash-input r-students" style="height:100px; font-weight:normal; margin-top:10px;" placeholder="Paste student names here... (one per line)">${r.students.join('\n')}</textarea>
-        `;
-        container.appendChild(div);
-    });
-}
-function addRosterCard() { syncDashboardToConfig(); config.roster.push({ className: "", students: [] }); renderRosterEditor(); }
-
-
-// Change Which Test Bank is Being Edited
-function changeEditTarget() {
-    playClick();
-    syncCardsToConfig(currentEditingKey); // Save current work before switching
-    
-    let sem = document.getElementById('editor-semester').value;
-    let grd = document.getElementById('editor-grade').value;
-    currentEditingKey = sem + "_" + grd;
-    
-    renderCardEditor(); // Render the new target's cards
-}
-
-
-// Card Editor Functions
-function renderCardEditor() {
-    const container = document.getElementById('editor-container'); container.innerHTML = '';
-    
-    let targetCards = config.tests && config.tests[currentEditingKey] ? config.tests[currentEditingKey] : [];
-
-    if(targetCards.length === 0) {
-        container.innerHTML = '<p style="color:white; font-style:italic;">No questions added for this semester/grade yet.</p>';
+function nextQuestion() {
+    // If the draw pile is empty, the student has answered every question exactly once.
+    if (drawPile.length === 0) {
+        endGame();
         return;
     }
+    
+    // Pull the next question off the top of the shuffled deck
+    currentQuestion = drawPile.pop();
+    renderQuestion();
+}
 
-    targetCards.forEach((card, index) => {
-        const div = document.createElement('div'); div.className = 'q-card';
-        let manualWordsHTML = '';
-        if(card.manualWords) {
-            card.manualWords.forEach(mw => {
-                manualWordsHTML += `
-                <div class="manual-word-row" style="display:flex; gap:10px; margin-bottom:5px;">
-                    <input type="text" class="dash-input c-mw-word" value="${mw.word}" placeholder="Word" style="flex:2; margin:0;">
-                    <input type="number" class="dash-input c-mw-pts" value="${mw.pts}" placeholder="Pts" style="flex:1; margin:0;">
-                    <button class="dash-btn danger small" onclick="this.parentElement.remove()" style="margin:0;">X</button>
-                </div>`;
-            });
-        }
-        div.innerHTML = `
-            <h2 style="color:white;">Card ${index + 1}</h2>
-            <label class="dash-label">Part 1 Scoring Mode</label>
-            <select class="dash-input c-p1mode" onchange="toggleModeUI(this)">
-                <option value="auto" ${card.p1Mode === 'auto' ? 'selected' : ''}>Automatic (20 pts divided evenly)</option>
-                <option value="manual" ${card.p1Mode === 'manual' ? 'selected' : ''}>Manual (Add specific words & points)</option>
-            </select>
-            <div class="ui-auto" style="display: ${card.p1Mode === 'auto' ? 'block' : 'none'};">
-                <label class="dash-label">Sentence</label>
-                <input type="text" class="dash-input c-sent" value="${card.sentence}" placeholder="e.g. The quick brown fox...">
-            </div>
-            <div class="ui-manual" style="display: ${card.p1Mode === 'manual' ? 'block' : 'none'}; background:rgba(0,0,0,0.2); padding:10px; border-radius:5px;">
-                <label class="dash-label">Words & Points List</label>
-                <div class="mw-container">${manualWordsHTML}</div>
-                <button class="dash-btn action small" style="margin-top:10px;" onclick="addManualWordRow(this)">➕ Add Word</button>
-            </div>
-            <hr>
-            <div class="grid-2">
-                <div>
-                    <label class="dash-label">Q1 Text</label><input type="text" class="dash-input c-q1" value="${card.q1}">
-                    <label class="dash-label">Options</label>
-                    <input type="text" class="dash-input c-q1o0" value="${card.q1opts[0] || ''}">
-                    <input type="text" class="dash-input c-q1o1" value="${card.q1opts[1] || ''}">
-                    <input type="text" class="dash-input c-q1o2" value="${card.q1opts[2] || ''}">
-                    <input type="text" class="dash-input c-q1o3" value="${card.q1opts[3] || ''}">
-                    <div style="display:flex; gap:10px;">
-                        <select class="dash-input c-q1ans" style="flex:2;">
-                            <option value="0" ${card.q1ans == 0 ? 'selected' : ''}>Correct: Option 1</option>
-                            <option value="1" ${card.q1ans == 1 ? 'selected' : ''}>Correct: Option 2</option>
-                            <option value="2" ${card.q1ans == 2 ? 'selected' : ''}>Correct: Option 3</option>
-                            <option value="3" ${card.q1ans == 3 ? 'selected' : ''}>Correct: Option 4</option>
-                        </select>
-                        <input type="number" class="dash-input c-q1pts" value="${card.q1pts}" placeholder="Pts" style="flex:1;">
-                    </div>
-                </div>
-                <div>
-                    <label class="dash-label">Q2 Text</label><input type="text" class="dash-input c-q2" value="${card.q2}">
-                    <label class="dash-label">Options</label>
-                    <input type="text" class="dash-input c-q2o0" value="${card.q2opts[0] || ''}">
-                    <input type="text" class="dash-input c-q2o1" value="${card.q2opts[1] || ''}">
-                    <input type="text" class="dash-input c-q2o2" value="${card.q2opts[2] || ''}">
-                    <input type="text" class="dash-input c-q2o3" value="${card.q2opts[3] || ''}">
-                    <div style="display:flex; gap:10px;">
-                        <select class="dash-input c-q2ans" style="flex:2;">
-                            <option value="0" ${card.q2ans == 0 ? 'selected' : ''}>Correct: Option 1</option>
-                            <option value="1" ${card.q2ans == 1 ? 'selected' : ''}>Correct: Option 2</option>
-                            <option value="2" ${card.q2ans == 2 ? 'selected' : ''}>Correct: Option 3</option>
-                            <option value="3" ${card.q2ans == 3 ? 'selected' : ''}>Correct: Option 4</option>
-                        </select>
-                        <input type="number" class="dash-input c-q2pts" value="${card.q2pts}" placeholder="Pts" style="flex:1;">
-                    </div>
-                </div>
-            </div>
-            <button class="dash-btn danger" style="margin-top:15px;" onclick="deleteCard(${index})">🗑️ Delete Card</button>
-        `;
-        container.appendChild(div);
+function renderQuestion() {
+    document.getElementById('question-text').innerText = currentQuestion.q || "Choose the correct word:";
+    
+    const imgEl = document.getElementById('game-image');
+    if(currentQuestion.img) {
+        imgEl.src = currentQuestion.img;
+        imgEl.style.display = 'block';
+    } else {
+        imgEl.style.display = 'none';
+        imgEl.src = "";
+    }
+
+    const container = document.getElementById('options-container');
+    container.innerHTML = '';
+
+    // Combine correct and wrong options, remove blanks, and shuffle the buttons
+    let allOptions = [currentQuestion.correct, ...currentQuestion.wrongs].filter(opt => opt.trim() !== "");
+    allOptions = shuffle(allOptions);
+
+    allOptions.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'btn option-btn';
+        btn.innerText = opt;
+        btn.onclick = () => handleAnswer(opt, btn);
+        container.appendChild(btn);
     });
 }
 
-function toggleModeUI(selectElem) {
-    const cardDiv = selectElem.closest('.q-card');
-    if(selectElem.value === 'auto') { cardDiv.querySelector('.ui-auto').style.display = 'block'; cardDiv.querySelector('.ui-manual').style.display = 'none'; } 
-    else { cardDiv.querySelector('.ui-auto').style.display = 'none'; cardDiv.querySelector('.ui-manual').style.display = 'block'; }
+function handleAnswer(selected, btnElement) {
+    // Disable buttons to prevent double-clicking
+    const buttons = document.querySelectorAll('.option-btn');
+    buttons.forEach(b => b.disabled = true);
+
+    if (selected === currentQuestion.correct) {
+        sfx.correct();
+        currentScore++;
+        document.getElementById('score-hud').innerText = `⭐ ${currentScore}`;
+        
+        btnElement.style.backgroundColor = '#06D6A0'; // Green
+        btnElement.style.boxShadow = '0 8px 0px #04A77B';
+        
+        setTimeout(nextQuestion, 1200);
+    } else {
+        sfx.wrong();
+        btnElement.style.backgroundColor = '#FF6B6B'; // Red
+        btnElement.style.boxShadow = '0 8px 0px #C44536';
+        
+        // Visually reveal the correct answer
+        buttons.forEach(b => {
+            if(b.innerText === currentQuestion.correct) {
+                b.style.backgroundColor = '#06D6A0';
+                b.style.boxShadow = '0 8px 0px #04A77B';
+            }
+        });
+
+        setTimeout(nextQuestion, 2000); // Wait longer so they learn the correct answer
+    }
 }
 
-function addManualWordRow(btnElem) {
-    const container = btnElem.previousElementSibling; const div = document.createElement('div');
-    div.className = "manual-word-row"; div.style.cssText = "display:flex; gap:10px; margin-bottom:5px;";
-    div.innerHTML = `<input type="text" class="dash-input c-mw-word" placeholder="Word" style="flex:2; margin:0;"><input type="number" class="dash-input c-mw-pts" placeholder="Pts" value="1" style="flex:1; margin:0;"><button class="dash-btn danger small" onclick="this.parentElement.remove()" style="margin:0;">X</button>`;
-    container.appendChild(div);
+function endGame() {
+    sfx.correct();
+    document.getElementById('final-score').innerText = `You scored ${currentScore} out of ${config.questions.length}!`;
+    document.getElementById('score-hud').style.display = 'none';
+    switchScreen('end-screen');
 }
 
-function addQuestionCard() { 
-    syncCardsToConfig(currentEditingKey); 
-    if(!config.tests[currentEditingKey]) config.tests[currentEditingKey] = [];
-    config.tests[currentEditingKey].push({ p1Mode: "auto", sentence: "", manualWords: [], q1: "", q1opts: ["", "", "", ""], q1ans: 0, q1pts: 5, q2: "", q2opts: ["", "", "", ""], q2ans: 0, q2pts: 5 }); 
-    renderCardEditor(); 
+function resetGame() {
+    sfx.click();
+    document.getElementById('student-name').value = '';
+    switchScreen('start-screen');
 }
 
-function deleteCard(idx) { 
-    if(confirm("Delete this card?")) { 
-        syncCardsToConfig(currentEditingKey); 
-        config.tests[currentEditingKey].splice(idx, 1); 
-        renderCardEditor(); 
-    } 
+// =========================================================
+// TEACHER DASHBOARD (WITH SAFE SYNCING)
+// =========================================================
+function openDashboard() {
+    sfx.click();
+    document.getElementById('dashboard-modal').style.display = 'block';
+    renderEditor();
+}
+
+function closeDashboard() {
+    sfx.click();
+    document.getElementById('dashboard-modal').style.display = 'none';
+}
+
+function renderEditor() {
+    const container = document.getElementById('editor-container');
+    container.innerHTML = '';
+    
+    config.questions.forEach((q, index) => {
+        const card = document.createElement('div');
+        card.className = 'dash-q-card';
+        card.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h2 style="color:var(--primary); margin:0; background:none; box-shadow:none; padding:0;">Question ${index + 1}</h2>
+                <button class="dash-btn danger" style="margin:0;" onclick="deleteQuestion(${index})">🗑️ Delete</button>
+            </div>
+            
+            <label class="dash-label">Question Text</label>
+            <input type="text" class="dash-input q-text" value="${q.q}" placeholder="e.g. What is this?">
+            
+            <label class="dash-label">Correct Answer</label>
+            <input type="text" class="dash-input q-correct" value="${q.correct}" placeholder="Required">
+            
+            <label class="dash-label">Wrong Options (Up to 3)</label>
+            <div style="display:flex; gap:10px;">
+                <input type="text" class="dash-input q-w1" value="${q.wrongs[0] || ''}" placeholder="Wrong 1">
+                <input type="text" class="dash-input q-w2" value="${q.wrongs[1] || ''}" placeholder="Wrong 2">
+                <input type="text" class="dash-input q-w3" value="${q.wrongs[2] || ''}" placeholder="Wrong 3">
+            </div>
+
+            <label class="dash-label">Upload Image (Saved locally)</label>
+            <input type="file" accept="image/*" class="dash-input" style="padding:0; background:none;" onchange="handleImageUpload(event, ${index})">
+            <img id="preview-${index}" class="img-preview" src="${q.img || ''}" style="display: ${q.img ? 'block' : 'none'};">
+        `;
+        container.appendChild(card);
+    });
+}
+
+// FIX #1: SAFELY SYNC DOM TO MEMORY BEFORE MUTATING ARRAY
+function syncEditorToConfig() {
+    const cards = document.querySelectorAll('.dash-q-card');
+    config.questions = Array.from(cards).map((card, idx) => {
+        return {
+            q: card.querySelector('.q-text').value,
+            correct: card.querySelector('.q-correct').value,
+            wrongs: [
+                card.querySelector('.q-w1').value,
+                card.querySelector('.q-w2').value,
+                card.querySelector('.q-w3').value
+            ],
+            // Pull image directly from current config state, as FileReader handles it asynchronously
+            img: config.questions[idx]?.img || "" 
+        };
+    });
+}
+
+function addQuestion() {
+    syncEditorToConfig(); // Lock in typed data
+    config.questions.push({ q: "", img: "", correct: "", wrongs: ["", "", ""] }); // Add empty card
+    renderEditor(); // Redraw UI
+}
+
+function deleteQuestion(index) {
+    if(confirm("Are you sure you want to delete this question?")) {
+        syncEditorToConfig(); // Lock in typed data
+        config.questions.splice(index, 1); // Remove target
+        renderEditor(); // Redraw UI
+    }
+}
+
+// Convert uploaded image to Base64 (FileReader API)
+function handleImageUpload(event, index) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            config.questions[index].img = e.target.result; // Save base64 string directly to state
+            const preview = document.getElementById(`preview-${index}`);
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+        }
+        reader.readAsDataURL(file);
+    }
 }
 
 function saveDashboard() {
-    playClick();
-    config.activeSemester = document.getElementById('dash-active-semester').value;
-    config.activeGrade = document.getElementById('dash-active-grade').value;
-    config.scriptUrl = document.getElementById('dash-script-url').value.trim();
-    config.timerSeconds = parseInt(document.getElementById('dash-timer').value) || 70;
-    config.fontFamily = document.getElementById('dash-font').value;
-    
-    syncDashboardToConfig(); 
-    localStorage.setItem('oralTestConfig', JSON.stringify(config));
-    
-    // Apply changes instantly to Start Screen
-    document.body.style.setProperty('--main-font', config.fontFamily);
-    document.getElementById('display-test-info').innerText = `${config.activeSemester} | ${config.activeGrade}`;
-    pool = []; 
-    renderClassDropdown(); 
-    document.getElementById('student-grid').innerHTML = ''; 
-    alert("Settings saved successfully!"); closeDashboard();
+    sfx.click();
+    syncEditorToConfig(); // Final sync before saving
+    localStorage.setItem('vocabQuizDB', JSON.stringify(config));
+    alert("Game Settings Saved Successfully!");
+    closeDashboard();
 }
 
-function exportData() {
-    playClick(); syncDashboardToConfig(); 
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(config));
-    const a = document.createElement('a'); a.setAttribute("href", dataStr); a.setAttribute("download", "oral_test_settings.json"); a.click();
+// Data Management: Export JSON
+function exportJSON() {
+    sfx.click();
+    syncEditorToConfig(); // Ensure latest typed data is exported
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(config, null, 2));
+    const dlAnchorElem = document.createElement('a');
+    dlAnchorElem.setAttribute("href", dataStr);
+    dlAnchorElem.setAttribute("download", "vocab_game_data.json");
+    dlAnchorElem.click();
 }
 
-function importData(event) {
-    const file = event.target.files[0]; if (!file) return;
+// Data Management: Import JSON
+function importJSON(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
     const reader = new FileReader();
     reader.onload = function(e) {
         try {
-            const imported = JSON.parse(e.target.result);
-            if(imported.tests || imported.cards) { // Basic Validation
-                config = imported;
-                
-                // Run silent migration if needed
-                if(config.cards && !config.tests) {
-                    config.tests = {};
-                    let fallbackKey = (config.semester || "First Semester") + "_" + (config.grade || "Grade 1");
-                    config.tests[fallbackKey] = config.cards;
-                    delete config.cards; 
-                }
-
-                document.body.style.setProperty('--main-font', config.fontFamily || "'Century Gothic', 'AppleGothic', sans-serif");
-                alert("Import successful! Opening Dashboard to verify data. Don't forget to click 'Save Settings ✅' to apply.");
-                openDashboard(); // Re-open dashboard with fresh imported data
-            } else { alert("Invalid file format."); }
-        } catch (err) { alert("Error reading file."); }
+            const importedData = JSON.parse(e.target.result);
+            if(importedData.questions && Array.isArray(importedData.questions)) {
+                config = importedData;
+                renderEditor();
+                alert("Import successful! Don't forget to click 'Save Settings ✅'.");
+            } else {
+                alert("Error: File format is incorrect.");
+            }
+        } catch (err) {
+            alert("Error parsing JSON file.");
+        }
     };
     reader.readAsText(file);
 }
