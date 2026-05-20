@@ -144,7 +144,7 @@
         box-sizing: border-box; overflow-y: auto; color: white; font-family: Arial, sans-serif; font-weight: normal;
     }
     #help-modal { z-index: 300; background: rgba(20, 22, 35, 0.99); }
-    .dash-container { max-width: 900px; margin: 0 auto; background: #0077B6; padding: 30px; border-radius: 10px; border: 4px solid var(--primary); }
+    .dash-container { max-width: 900px; margin: 0 auto; background: #0077B6; padding: 30px; border-radius: 10px; border: 4px solid var(--primary); position: relative;}
     .dash-container h1 { font-size: 2rem; margin: 0 0 10px 0; color: white; }
     .dash-container h2 { font-size: 1.5rem; margin: 0 0 15px 0; color: var(--primary); }
     .dash-label { font-size: 0.9rem; margin-top: 10px; display: block; font-weight: bold; color: #FFF; }
@@ -183,6 +183,13 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     .help-list li { margin-bottom: 15px; font-size: 1.1rem; line-height: 1.5; }
     .help-code { width: 100%; height: 300px; font-family: monospace; font-size: 0.9rem; background: #1A202C; color: #A0AEC0; padding: 15px; border-radius: 5px; border: 1px solid #4A5568; white-space: pre; }
+    
+    /* Loading Overlay */
+    #loading-overlay {
+        display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+        background: rgba(0,0,0,0.8); z-index: 999; color: white; font-size: 2rem;
+        justify-content: center; align-items: center; text-align: center; border-radius: 10px;
+    }
 </style>
 </head>
 <body>
@@ -217,7 +224,6 @@
             </select>
         </div>
         
-        <!-- Interactive Roster Grid -->
         <div id="student-grid"></div>
     </div>
 
@@ -261,6 +267,8 @@
     <!-- Teacher Dashboard Modal -->
     <div id="dashboard-modal">
         <div class="dash-container">
+            <div id="loading-overlay">⏳ Syncing with Cloud...</div>
+            
             <h1>⚙️ Teacher Dashboard</h1>
             
             <!-- Dashboard Tabs Navigation -->
@@ -268,7 +276,7 @@
                 <button class="dash-tab-btn active" onclick="openDashTab('tab-general')">⚙️ General Settings</button>
                 <button class="dash-tab-btn" onclick="openDashTab('tab-rosters')">👥 Class Rosters</button>
                 <button class="dash-tab-btn" onclick="openDashTab('tab-cards')">📝 Test Cards</button>
-                <button class="dash-tab-btn" onclick="openDashTab('tab-backup')">💾 Backup / Restore</button>
+                <button class="dash-tab-btn" onclick="openDashTab('tab-backup')">☁️ Cloud Sync & Backup</button>
             </div>
 
             <!-- TAB 1: General Settings -->
@@ -295,7 +303,7 @@
                     </div>
 
                     <hr>
-                    <label class="dash-label">Google Script Web App URL (For saving data):</label>
+                    <label class="dash-label">Google Script Web App URL (For saving data to Drive):</label>
                     <input type="text" id="dash-script-url" class="dash-input" placeholder="https://script.google.com/macros/s/...">
                     <button class="dash-btn help-btn" onclick="openHelpModal()">❓ Need Help Setting Up Google Drive?</button>
                 </div>
@@ -337,14 +345,31 @@
                 <div id="editor-container"></div>
             </div>
 
-            <!-- TAB 4: Backup / Restore -->
+            <!-- TAB 4: Cloud Sync & Backup -->
             <div id="tab-backup" class="dash-tab-content">
-                <div style="background: rgba(0,0,0,0.1); padding: 25px; border-radius: 8px; text-align: center;">
-                    <h2 style="color: white; margin-top:0;">Save or Load Your Setup</h2>
-                    <p style="color: white;">Moving to a new computer? Export your data here and import it on the new machine so you don't lose your questions or rosters!</p>
-                    <button class="dash-btn action" style="font-size: 1.5rem; padding: 15px 30px;" onclick="exportData()">💾 Export Data (Backup)</button>
-                    <button class="dash-btn help-btn" style="font-size: 1.5rem; padding: 15px 30px;" onclick="document.getElementById('import-file').click()">📂 Import Backup File</button>
-                    <input type="file" id="import-file" style="display:none;" accept=".json" onchange="importData(event)">
+                <!-- Local Backup -->
+                <div style="background: rgba(0,0,0,0.1); padding: 20px; border-radius: 8px; text-align: center; margin-bottom: 20px;">
+                    <h2 style="color: white; margin-top:0;">Local File Backup</h2>
+                    <p style="color: white;">Save your configuration to a file on your computer, or load a previous file.</p>
+                    <button class="dash-btn action" style="font-size: 1.2rem; padding: 10px 20px;" onclick="exportData()">💾 Export Data File</button>
+                    <button class="dash-btn help-btn" style="font-size: 1.2rem; padding: 10px 20px;" onclick="document.getElementById('import-file').click()">📂 Import Data File</button>
+                    <input type="file" id="import-file" style="display:none;" accept=".json" onchange="importLocalFile(event)">
+                </div>
+                
+                <!-- Cloud GitHub Sync -->
+                <div style="background: rgba(0,0,0,0.1); padding: 20px; border-radius: 8px;">
+                    <h2 style="color: var(--primary); margin-top:0;">☁️ Cloud Sync (GitHub / Web)</h2>
+                    <p style="color: white; font-size: 0.95rem;">Host your exported JSON file on GitHub (Raw URL) to automatically synchronize your tests across all smartboards without needing a USB drive.</p>
+                    
+                    <label class="dash-label">Raw JSON URL:</label>
+                    <input type="text" id="dash-github-url" class="dash-input" placeholder="https://raw.githubusercontent.com/.../data.json">
+                    
+                    <div style="display:flex; align-items:center; gap: 10px; margin-bottom:15px; margin-top: 10px;">
+                        <input type="checkbox" id="dash-auto-sync" style="width:20px; height:20px; cursor:pointer;">
+                        <label style="color:white; font-size:1.1rem; cursor:pointer;" for="dash-auto-sync">Auto-sync from URL every time the game opens</label>
+                    </div>
+                    
+                    <button class="dash-btn action" style="font-size: 1.2rem; padding: 10px 20px;" onclick="fetchFromGithub(false)">📥 Fetch & Apply Now</button>
                 </div>
             </div>
 
@@ -419,19 +444,6 @@ function doPost(e) {
     </div>
 
 <script>
-// --- Background Animation ---
-window.onload = () => {
-    const bg = document.getElementById('floating-bg');
-    const elements = ['A', 'B', 'C', '1', '2', '3', 'Dog', 'Cat', 'Hello', '★', '🎵', '?', 'Apple', 'Red', 'Yes', 'No'];
-    for(let i=0; i<25; i++) {
-        let el = document.createElement('div'); el.className = 'float-el';
-        el.innerText = elements[Math.floor(Math.random() * elements.length)];
-        el.style.left = Math.random() * 95 + 'vw'; el.style.animationDuration = (Math.random() * 15 + 10) + 's';
-        el.style.animationDelay = (Math.random() * 5) + 's'; el.style.fontSize = (Math.random() * 3 + 1.5) + 'rem';
-        bg.appendChild(el);
-    }
-};
-
 // --- Audio Engine ---
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 let audioCtx = null;
@@ -456,6 +468,8 @@ const defaultConfig = {
     scriptUrl: DEFAULT_URL, 
     timerSeconds: 70, 
     fontFamily: "'Century Gothic', 'AppleGothic', sans-serif",
+    githubUrl: "https://raw.githubusercontent.com/teachercristw/EVoraltest/refs/heads/main/oral_test_settings.json",
+    autoSyncGithub: true,
     grades: ["Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5", "Grade 6"],
     roster: [
         { grade: "Grade 1", className: "1A", students: ["John Doe", "Jane Smith", "Emily Chen", "Michael Wu"] },
@@ -475,7 +489,7 @@ const defaultConfig = {
 
 let config = JSON.parse(localStorage.getItem('oralTestConfig')) || defaultConfig;
 
-// Data Migration Script
+// Data Migration Script to ensure new variables exist even on old local configs
 if(config.cards && !config.tests) {
     config.tests = {};
     let fallbackKey = (config.semester || "First Semester") + "_" + (config.grade || "Grade 1");
@@ -487,6 +501,11 @@ if(!config.grades) {
     if(config.roster) { config.roster.forEach(r => { if(r.grade && !config.grades.includes(r.grade)) config.grades.push(r.grade); }); }
 }
 if(config.roster) { config.roster.forEach(r => { if(!r.grade) r.grade = "Grade 1"; }); }
+if(config.githubUrl === undefined || config.githubUrl === "") {
+    config.githubUrl = "https://raw.githubusercontent.com/teachercristw/EVoraltest/refs/heads/main/oral_test_settings.json";
+    config.autoSyncGithub = true; // Force default requirement
+}
+
 for(let key in config.tests) { config.tests[key].forEach(card => { if(card.locked === undefined) card.locked = true; }); }
 
 let pool = [];
@@ -494,11 +513,37 @@ let completedStudents = {};
 let currentEditingKey = ""; 
 let activeRosterGrade = config.grades.length > 0 ? config.grades[0] : "";
 
-// Initialize App
-document.body.style.setProperty('--main-font', config.fontFamily || "'Century Gothic', 'AppleGothic', sans-serif");
-document.getElementById('start-semester').value = config.activeSemester || "First Semester";
-updateGlobalGradeDropdowns();
-document.getElementById('display-test-info').innerText = `${config.activeSemester} | ${config.activeGrade}`;
+// --- Initialization & Cloud Sync ---
+window.onload = () => {
+    // 1. Background Animation
+    const bg = document.getElementById('floating-bg');
+    const elements = ['A', 'B', 'C', '1', '2', '3', 'Dog', 'Cat', 'Hello', '★', '🎵', '?', 'Apple', 'Red', 'Yes', 'No'];
+    for(let i=0; i<25; i++) {
+        let el = document.createElement('div'); el.className = 'float-el';
+        el.innerText = elements[Math.floor(Math.random() * elements.length)];
+        el.style.left = Math.random() * 95 + 'vw'; el.style.animationDuration = (Math.random() * 15 + 10) + 's';
+        el.style.animationDelay = (Math.random() * 5) + 's'; el.style.fontSize = (Math.random() * 3 + 1.5) + 'rem';
+        bg.appendChild(el);
+    }
+    
+    // 2. Initialize UI with current config
+    applyConfigStateToApp();
+
+    // 3. Auto-Sync Check on Startup (Silent)
+    if(config.autoSyncGithub && config.githubUrl) {
+        fetchFromGithub(true); 
+    }
+};
+
+function applyConfigStateToApp() {
+    document.body.style.setProperty('--main-font', config.fontFamily || "'Century Gothic', 'AppleGothic', sans-serif");
+    document.getElementById('start-semester').value = config.activeSemester || "First Semester";
+    updateGlobalGradeDropdowns();
+    document.getElementById('display-test-info').innerText = `${config.activeSemester} | ${config.activeGrade}`;
+    pool = []; 
+    renderClassDropdown(); 
+    document.getElementById('student-grid').innerHTML = ''; 
+}
 
 function updateActiveTest() {
     config.activeSemester = document.getElementById('start-semester').value;
@@ -577,6 +622,7 @@ let part1Score = 0; let part1Max = 20; let q1Score = 0; let q2Score = 0; let mis
 
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; }
+    return array;
 }
 
 function getNextCard() {
@@ -728,7 +774,7 @@ function submitToDrive() {
 function resetGame() { playClick(); switchScreen('start-screen'); renderStudentGrid(); }
 
 // ==========================================
-// TEACHER DASHBOARD GUI (TABBED)
+// TEACHER DASHBOARD GUI
 // ==========================================
 
 function populateEditorDropdowns() {
@@ -744,10 +790,14 @@ function openDashboard() {
     document.getElementById('dash-timer').value = config.timerSeconds;
     document.getElementById('dash-font').value = config.fontFamily;
     
+    document.getElementById('dash-github-url').value = config.githubUrl || "";
+    document.getElementById('dash-auto-sync').checked = config.autoSyncGithub;
+    
     if(!activeRosterGrade && config.grades && config.grades.length > 0) activeRosterGrade = config.grades[0];
     
     renderRosterEditor(); 
     populateEditorDropdowns();
+    
     document.getElementById('editor-semester').value = config.activeSemester;
     document.getElementById('editor-grade').value = config.activeGrade;
     currentEditingKey = config.activeSemester + "_" + config.activeGrade;
@@ -769,16 +819,15 @@ function openDashTab(tabId) {
 }
 
 function syncDashboardToConfig() {
-    if(activeRosterGrade) {
-        let updatedClassesForGrade = [];
-        document.querySelectorAll('.roster-card').forEach(rc => {
-            let cName = rc.querySelector('.r-class').value.trim();
-            let sList = rc.querySelector('.r-students').value.split('\n').map(s => s.trim()).filter(s => s !== "");
-            if(cName) updatedClassesForGrade.push({ grade: activeRosterGrade, className: cName, students: sList });
-        });
-        config.roster = config.roster.filter(r => r.grade !== activeRosterGrade);
-        config.roster.push(...updatedClassesForGrade);
-    }
+    let newRoster = [];
+    document.querySelectorAll('.roster-card').forEach(rc => {
+        let cName = rc.querySelector('.r-class').value.trim();
+        let sList = rc.querySelector('.r-students').value.split('\n').map(s => s.trim()).filter(s => s !== "");
+        if(cName) newRoster.push({ grade: activeRosterGrade, className: cName, students: sList });
+    });
+    config.roster = config.roster.filter(r => r.grade !== activeRosterGrade);
+    config.roster.push(...newRoster);
+    
     syncCardsToConfig(currentEditingKey);
 }
 
@@ -826,9 +875,7 @@ function addNewGrade() {
             activeRosterGrade = newGrade;
             updateGlobalGradeDropdowns();
             renderRosterEditor();
-        } else {
-            alert("This grade already exists.");
-        }
+        } else { alert("This grade already exists."); }
     }
 }
 
@@ -836,20 +883,14 @@ function deleteCurrentGrade() {
     if(confirm(`Are you sure you want to completely delete "${activeRosterGrade}" and all its classes?`)) {
         config.grades = config.grades.filter(g => g !== activeRosterGrade);
         config.roster = config.roster.filter(r => r.grade !== activeRosterGrade);
-        
-        for(let key in config.tests) {
-            if(key.endsWith("_" + activeRosterGrade)) delete config.tests[key];
-        }
-        
+        for(let key in config.tests) { if(key.endsWith("_" + activeRosterGrade)) delete config.tests[key]; }
         activeRosterGrade = config.grades.length > 0 ? config.grades[0] : null;
         updateGlobalGradeDropdowns();
         renderRosterEditor();
     }
 }
 
-function switchRosterGrade(grade) {
-    playClick(); syncDashboardToConfig(); activeRosterGrade = grade; renderRosterEditor();
-}
+function switchRosterGrade(grade) { playClick(); syncDashboardToConfig(); activeRosterGrade = grade; renderRosterEditor(); }
 
 function renderRosterEditor() {
     const tabsContainer = document.getElementById('roster-tabs-container');
@@ -882,9 +923,7 @@ function renderRosterEditor() {
 }
 function addRosterCard() { 
     if(!activeRosterGrade) return alert("Please add a Grade first!");
-    syncDashboardToConfig(); 
-    config.roster.push({ grade: activeRosterGrade, className: "", students: [] }); 
-    renderRosterEditor(); 
+    syncDashboardToConfig(); config.roster.push({ grade: activeRosterGrade, className: "", students: [] }); renderRosterEditor(); 
 }
 
 function changeEditTarget() {
@@ -1003,16 +1042,13 @@ function saveDashboard() {
     config.timerSeconds = parseInt(document.getElementById('dash-timer').value) || 70;
     config.fontFamily = document.getElementById('dash-font').value;
     
+    config.githubUrl = document.getElementById('dash-github-url').value.trim();
+    config.autoSyncGithub = document.getElementById('dash-auto-sync').checked;
+    
     syncDashboardToConfig(); 
     localStorage.setItem('oralTestConfig', JSON.stringify(config));
     
-    document.body.style.setProperty('--main-font', config.fontFamily);
-    
-    // Ensure homepage matches what was set, triggering a class render
-    updateGlobalGradeDropdowns();
-    renderClassDropdown(); 
-    
-    pool = []; 
+    applyConfigStateToApp();
     alert("Settings saved successfully!"); closeDashboard();
 }
 
@@ -1022,30 +1058,75 @@ function exportData() {
     const a = document.createElement('a'); a.setAttribute("href", dataStr); a.setAttribute("download", "oral_test_settings.json"); a.click();
 }
 
-function importData(event) {
+// Applies imported/fetched data safely
+function applyConfigData(imported, silent = false) {
+    if(imported.tests || imported.cards) { 
+        config = imported;
+        if(config.cards && !config.tests) {
+            config.tests = {};
+            let fallbackKey = (config.semester || "First Semester") + "_" + (config.grade || "Grade 1");
+            config.tests[fallbackKey] = config.cards;
+            delete config.cards; 
+        }
+        if(!config.grades) config.grades = ["Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5", "Grade 6"];
+        
+        // Preserve user's local URL setting if the imported file lacks it, otherwise use fallback
+        if(config.githubUrl === undefined) config.githubUrl = "https://raw.githubusercontent.com/teachercristw/EVoraltest/refs/heads/main/oral_test_settings.json";
+        if(config.autoSyncGithub === undefined) config.autoSyncGithub = true;
+        
+        localStorage.setItem('oralTestConfig', JSON.stringify(config));
+        applyConfigStateToApp();
+        
+        if(!silent) {
+            alert("Sync successful! Data applied.");
+            openDashboard(); 
+        }
+    } else { 
+        if(!silent) alert("Invalid file format."); 
+    }
+}
+
+function importLocalFile(event) {
     const file = event.target.files[0]; if (!file) return;
     const reader = new FileReader();
     reader.onload = function(e) {
-        try {
-            const imported = JSON.parse(e.target.result);
-            if(imported.tests || imported.cards) { 
-                config = imported;
-                if(config.cards && !config.tests) {
-                    config.tests = {};
-                    let fallbackKey = (config.semester || "First Semester") + "_" + (config.grade || "Grade 1");
-                    config.tests[fallbackKey] = config.cards;
-                    delete config.cards; 
-                }
-                if(!config.grades) config.grades = ["Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5", "Grade 6"];
-                
-                document.body.style.setProperty('--main-font', config.fontFamily || "'Century Gothic', 'AppleGothic', sans-serif");
-                updateGlobalGradeDropdowns();
-                alert("Import successful! Opening Dashboard to verify data. Don't forget to click 'Save Settings ✅' to apply.");
-                openDashboard(); 
-            } else { alert("Invalid file format."); }
-        } catch (err) { alert("Error reading file."); }
+        try { applyConfigData(JSON.parse(e.target.result), false); } 
+        catch (err) { alert("Error reading file."); }
     };
     reader.readAsText(file);
+}
+
+// Cloud Fetch Logic
+function fetchFromGithub(silent) {
+    let url = silent ? config.githubUrl : document.getElementById('dash-github-url').value.trim();
+    if(!url) {
+        if(!silent) alert("Please enter a Raw GitHub URL first.");
+        return;
+    }
+    
+    if(!silent) {
+        playClick();
+        document.getElementById('loading-overlay').style.display = "flex";
+    }
+
+    // Append timestamp to bust aggressive browser cache
+    fetch(url + '?nocache=' + new Date().getTime())
+        .then(res => {
+            if(!res.ok) throw new Error("Network response was not ok");
+            return res.json();
+        })
+        .then(data => {
+            if(!silent) document.getElementById('loading-overlay').style.display = "none";
+            applyConfigData(data, silent);
+        })
+        .catch(err => {
+            if(!silent) {
+                document.getElementById('loading-overlay').style.display = "none";
+                alert("Failed to fetch from GitHub. Please ensure you are using the 'Raw' URL format.");
+            } else {
+                console.log("Silent cloud sync failed, using local fallback data.");
+            }
+        });
 }
 </script>
 </body>
