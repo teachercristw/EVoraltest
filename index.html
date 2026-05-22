@@ -124,11 +124,13 @@
     }
     .word-btn.incorrect { background-color: var(--incorrect); box-shadow: 0 8px 0 var(--incorrect-dark); transform: scale(0.95) translateY(4px); opacity: 0.9; }
 
-    /* Part 2: 2x2 Grid */
-    .mcq-container { width: 100%; max-width: 900px; background: rgba(255,255,255,0.95); padding: 25px; border-radius: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); margin-bottom: 25px; }
+    /* Part 2: 2x2 Grid (Updated for kid-friendly colors) */
+    .mcq-container { width: 100%; max-width: 900px; padding: 25px; border-radius: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); margin-bottom: 25px; box-sizing: border-box; }
+    #mcq1 { background-color: #FFF3C4; border: 5px solid var(--primary); }
+    #mcq2 { background-color: #D4EDDA; border: 5px solid var(--correct); }
     .mcq-container h3 { margin: 0 0 15px 0; font-size: 1.8rem; color: var(--secondary-dark); }
     .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
-    .option-btn { font-family: var(--main-font); font-weight:bold; font-size: 1.5rem; padding: 20px; background-color: #EDF2F7; color: var(--text-dark); box-shadow: 0 6px 0 #CBD5E0; border:none; border-radius:15px; cursor:pointer; }
+    .option-btn { font-family: var(--main-font); font-weight:bold; font-size: 1.5rem; padding: 20px; background-color: #FFFFFF; color: var(--text-dark); box-shadow: 0 6px 0 #CBD5E0; border:none; border-radius:15px; cursor:pointer; }
     .option-btn.selected { background-color: var(--primary); box-shadow: 0 6px 0 var(--primary-dark); color: var(--secondary-dark); text-align: center; }
 
     /* Gear Icon */
@@ -444,6 +446,17 @@ function doPost(e) {
     </div>
 
 <script>
+// --- Helper Function: Safely encode text to prevent quotes from breaking inputs ---
+function escapeHTML(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 // --- Audio Engine ---
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 let audioCtx = null;
@@ -913,10 +926,10 @@ function renderRosterEditor() {
         let div = document.createElement('div'); div.className = 'roster-card';
         div.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <input type="text" class="dash-input r-class" value="${r.className}" placeholder="Class Name (e.g. 3A)" style="max-width:200px; margin:0;">
+                <input type="text" class="dash-input r-class" value="${escapeHTML(r.className)}" placeholder="Class Name (e.g. 3A)" style="max-width:200px; margin:0;">
                 <button class="dash-btn danger small" onclick="this.parentElement.parentElement.remove()">🗑️ Delete Class</button>
             </div>
-            <textarea class="dash-input r-students" style="height:100px; font-weight:normal; margin-top:10px;" placeholder="Paste student names here... (one per line)">${r.students.join('\n')}</textarea>
+            <textarea class="dash-input r-students" style="height:100px; font-weight:normal; margin-top:10px;" placeholder="Paste student names here... (one per line)">${escapeHTML(r.students.join('\n'))}</textarea>
         `;
         container.appendChild(div);
     });
@@ -952,14 +965,14 @@ function renderCardEditor() {
                         <button class="dash-btn danger small" style="margin:0;" onclick="deleteCard(${index})">🗑️</button>
                     </div>
                 </div>
-                <p style="color:#CAF0F8; margin: 10px 0 0 0; font-style:italic;">"${card.sentence ? card.sentence.substring(0,50) + '...' : '(No sentence text)'}"</p>
+                <p style="color:#CAF0F8; margin: 10px 0 0 0; font-style:italic;">"${escapeHTML(card.sentence ? card.sentence : '(No sentence text)')}"</p>
             `;
         } else {
             div.dataset.locked = "false"; div.classList.remove('locked');
             let manualWordsHTML = '';
             if(card.manualWords) {
                 card.manualWords.forEach(mw => {
-                    manualWordsHTML += `<div class="manual-word-row" style="display:flex; gap:10px; margin-bottom:5px;"><input type="text" class="dash-input c-mw-word" value="${mw.word}" placeholder="Word" style="flex:2; margin:0;"><input type="number" class="dash-input c-mw-pts" value="${mw.pts}" placeholder="Pts" style="flex:1; margin:0;"><button class="dash-btn danger small" onclick="this.parentElement.remove()" style="margin:0;">X</button></div>`;
+                    manualWordsHTML += `<div class="manual-word-row" style="display:flex; gap:10px; margin-bottom:5px;"><input type="text" class="dash-input c-mw-word" value="${escapeHTML(mw.word)}" placeholder="Word" style="flex:2; margin:0;"><input type="number" class="dash-input c-mw-pts" value="${mw.pts}" placeholder="Pts" style="flex:1; margin:0;"><button class="dash-btn danger small" onclick="this.parentElement.remove()" style="margin:0;">X</button></div>`;
                 });
             }
             div.innerHTML = `
@@ -972,14 +985,14 @@ function renderCardEditor() {
                     <option value="auto" ${card.p1Mode === 'auto' ? 'selected' : ''}>Automatic (20 pts divided evenly)</option>
                     <option value="manual" ${card.p1Mode === 'manual' ? 'selected' : ''}>Manual (Add specific words & points)</option>
                 </select>
-                <div class="ui-auto" style="display: ${card.p1Mode === 'auto' ? 'block' : 'none'};"><label class="dash-label">Sentence</label><input type="text" class="dash-input c-sent" value="${card.sentence}" placeholder="e.g. The quick brown fox..."></div>
+                <div class="ui-auto" style="display: ${card.p1Mode === 'auto' ? 'block' : 'none'};"><label class="dash-label">Sentence</label><input type="text" class="dash-input c-sent" value="${escapeHTML(card.sentence)}" placeholder="e.g. The quick brown fox..."></div>
                 <div class="ui-manual" style="display: ${card.p1Mode === 'manual' ? 'block' : 'none'}; background:rgba(0,0,0,0.2); padding:10px; border-radius:5px;"><label class="dash-label">Words & Points List</label><div class="mw-container">${manualWordsHTML}</div><button class="dash-btn action small" style="margin-top:10px;" onclick="addManualWordRow(this)">➕ Add Word</button></div>
                 <hr>
                 <div class="grid-2">
                     <div>
-                        <label class="dash-label">Q1 Text</label><input type="text" class="dash-input c-q1" value="${card.q1}">
+                        <label class="dash-label">Q1 Text</label><input type="text" class="dash-input c-q1" value="${escapeHTML(card.q1)}">
                         <label class="dash-label">Options</label>
-                        <input type="text" class="dash-input c-q1o0" value="${card.q1opts[0] || ''}"><input type="text" class="dash-input c-q1o1" value="${card.q1opts[1] || ''}"><input type="text" class="dash-input c-q1o2" value="${card.q1opts[2] || ''}"><input type="text" class="dash-input c-q1o3" value="${card.q1opts[3] || ''}">
+                        <input type="text" class="dash-input c-q1o0" value="${escapeHTML(card.q1opts[0] || '')}"><input type="text" class="dash-input c-q1o1" value="${escapeHTML(card.q1opts[1] || '')}"><input type="text" class="dash-input c-q1o2" value="${escapeHTML(card.q1opts[2] || '')}"><input type="text" class="dash-input c-q1o3" value="${escapeHTML(card.q1opts[3] || '')}">
                         <div style="display:flex; gap:10px;">
                             <select class="dash-input c-q1ans" style="flex:2;">
                                 <option value="0" ${card.q1ans == 0 ? 'selected' : ''}>Correct: Option 1</option><option value="1" ${card.q1ans == 1 ? 'selected' : ''}>Correct: Option 2</option><option value="2" ${card.q1ans == 2 ? 'selected' : ''}>Correct: Option 3</option><option value="3" ${card.q1ans == 3 ? 'selected' : ''}>Correct: Option 4</option>
@@ -988,9 +1001,9 @@ function renderCardEditor() {
                         </div>
                     </div>
                     <div>
-                        <label class="dash-label">Q2 Text</label><input type="text" class="dash-input c-q2" value="${card.q2}">
+                        <label class="dash-label">Q2 Text</label><input type="text" class="dash-input c-q2" value="${escapeHTML(card.q2)}">
                         <label class="dash-label">Options</label>
-                        <input type="text" class="dash-input c-q2o0" value="${card.q2opts[0] || ''}"><input type="text" class="dash-input c-q2o1" value="${card.q2opts[1] || ''}"><input type="text" class="dash-input c-q2o2" value="${card.q2opts[2] || ''}"><input type="text" class="dash-input c-q2o3" value="${card.q2opts[3] || ''}">
+                        <input type="text" class="dash-input c-q2o0" value="${escapeHTML(card.q2opts[0] || '')}"><input type="text" class="dash-input c-q2o1" value="${escapeHTML(card.q2opts[1] || '')}"><input type="text" class="dash-input c-q2o2" value="${escapeHTML(card.q2opts[2] || '')}"><input type="text" class="dash-input c-q2o3" value="${escapeHTML(card.q2opts[3] || '')}">
                         <div style="display:flex; gap:10px;">
                             <select class="dash-input c-q2ans" style="flex:2;">
                                 <option value="0" ${card.q2ans == 0 ? 'selected' : ''}>Correct: Option 1</option><option value="1" ${card.q2ans == 1 ? 'selected' : ''}>Correct: Option 2</option><option value="2" ${card.q2ans == 2 ? 'selected' : ''}>Correct: Option 3</option><option value="3" ${card.q2ans == 3 ? 'selected' : ''}>Correct: Option 4</option>
