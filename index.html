@@ -56,24 +56,35 @@
     input, textarea, select { user-select: auto; -webkit-user-select: auto; touch-action: auto; font-family: var(--main-font); }
 
     #top-bar {
-        flex: 0 0 auto; width: 100%; padding: 15px; display: none; justify-content: center; align-items: center; box-sizing: border-box;
+        flex: 0 0 auto; width: 100%; padding: 10px 15px; display: none; justify-content: center; align-items: center; box-sizing: border-box;
         background: var(--white); box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 10;
     }
+    
+    .timer-controls { display: flex; gap: 15px; align-items: center; justify-content: center; }
+    
     #timer-display {
-        font-size: 2.5rem; background: var(--white); color: var(--secondary); padding: 10px 40px; border-radius: 30px; 
-        border: 5px solid var(--primary); box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+        font-size: 2.5rem; background: var(--white); color: var(--secondary); padding: 5px 30px; border-radius: 30px; 
+        border: 5px solid var(--primary); box-shadow: 0 4px 0 rgba(0,0,0,0.1); min-width: 120px; text-align: center;
     }
+    
+    .timer-ctrl-btn {
+        font-family: var(--main-font); font-weight: bold; font-size: 1.5rem; 
+        padding: 10px 20px; border-radius: 20px; border: 4px solid var(--primary); 
+        background: var(--white); color: var(--secondary-dark); cursor: pointer;
+        box-shadow: 0 4px 0 rgba(0,0,0,0.1); transition: all 0.1s;
+    }
+    .timer-ctrl-btn:active { transform: translateY(4px); box-shadow: 0 0 0 rgba(0,0,0,0.1); }
 
     .screen {
         display: none; flex: 1 1 auto; overflow-y: auto; flex-direction: column; align-items: center; 
-        justify-content: flex-start; padding: 30px 20px; box-sizing: border-box; width: 100%; z-index: 1;
+        justify-content: flex-start; padding: 20px 20px; box-sizing: border-box; width: 100%; z-index: 1;
     }
     .screen.active { display: flex; }
 
-    .school-title { font-size: clamp(1.5rem, 3vw, 2.5rem); color: var(--primary); text-shadow: 2px 2px 0px var(--secondary-dark); margin-bottom: 0; text-transform: uppercase; letter-spacing: 2px;}
-    .main-title { font-size: clamp(3.5rem, 7vw, 5rem); text-align: center; color: var(--white); margin-top: 5px; margin-bottom: 20px; text-shadow: 4px 4px 0px var(--secondary-dark); }
-    .screen h2 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 20px; text-align: center; color: var(--white); text-shadow: 2px 2px 0px rgba(0,0,0,0.2); }
-    .test-info { font-size: 1.5rem; color: var(--secondary); margin-bottom: 30px; background: var(--primary); padding: 10px 30px; border-radius: 20px; box-shadow: 0 6px 0 var(--primary-dark); border: 3px solid white;}
+    .school-title { font-size: clamp(1.5rem, 3vw, 2.5rem); color: var(--primary); text-shadow: 2px 2px 0px var(--secondary-dark); margin-bottom: 0; letter-spacing: 2px;}
+    .main-title { font-size: clamp(3.5rem, 7vw, 5rem); text-align: center; color: var(--white); margin-top: 5px; margin-bottom: 10px; text-shadow: 4px 4px 0px var(--secondary-dark); }
+    .screen h2 { font-size: clamp(2rem, 4vw, 3rem); margin-top: 0; margin-bottom: 10px; text-align: center; color: var(--white); text-shadow: 2px 2px 0px rgba(0,0,0,0.2); }
+    .test-info { font-size: 1.5rem; color: var(--secondary); margin-bottom: 20px; background: var(--primary); padding: 10px 30px; border-radius: 20px; box-shadow: 0 6px 0 var(--primary-dark); border: 3px solid white;}
 
     .input-group { display: flex; flex-direction: row; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 900px; }
 
@@ -83,25 +94,25 @@
         box-shadow: 0 6px 0 rgba(0,0,0,0.1); flex: 1; min-width: 200px; cursor: pointer;
     }
 
-    /* Standard Game Buttons */
+    /* Standard Game Buttons - REMOVED text-transform: uppercase */
     .game-btn {
-        font-family: var(--main-font); font-weight: bold; font-size: 2rem; padding: 20px 40px; margin: 15px 10px; border: none;
+        font-family: var(--main-font); font-weight: bold; font-size: 2rem; padding: 15px 40px; margin: 10px; border: none;
         border-radius: 25px; background-color: var(--primary); color: var(--secondary-dark); cursor: pointer;
-        box-shadow: 0 8px 0 var(--primary-dark); transition: transform 0.1s, box-shadow 0.1s; min-width: 220px; min-height: 70px; text-transform: uppercase;
+        box-shadow: 0 8px 0 var(--primary-dark); transition: transform 0.1s, box-shadow 0.1s; min-width: 220px; min-height: 70px;
     }
     .game-btn:active { transform: translateY(8px); box-shadow: 0 0 0 var(--primary-dark); }
-    .game-btn.start-btn { background-color: var(--primary); font-size: 2.5rem; padding: 20px 60px; margin-top: 20px;}
+    .game-btn.start-btn { background-color: var(--primary); font-size: 2.5rem; padding: 20px 60px; margin-top: 10px;}
     .game-btn.alt-btn { background-color: var(--accent); color: white; box-shadow: 0 8px 0 var(--accent-dark); }
     .game-btn.alt-btn:active { box-shadow: 0 0 0 var(--accent-dark); }
     .game-btn.submit-btn { background-color: var(--correct); color: white; box-shadow: 0 8px 0 var(--correct-dark); }
     .game-btn.submit-btn:active { box-shadow: 0 0 0 var(--correct-dark); }
-    .game-btn.back-btn { background-color: #6C757D; color: white; box-shadow: 0 8px 0 #495057; font-size: 1.5rem; padding: 15px 30px;}
+    .game-btn.back-btn { background-color: #6C757D; color: white; box-shadow: 0 8px 0 #495057; font-size: 1.5rem; padding: 10px 25px; min-width: auto; min-height: auto;}
     .game-btn.back-btn:active { box-shadow: 0 0 0 #495057; }
 
     /* Clean Student Grid Elements */
     #student-grid {
         display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-        gap: 12px; margin-top: 20px; width: 100%; max-width: 1000px;
+        gap: 12px; margin-top: 10px; width: 100%; max-width: 1000px;
     }
     .student-btn {
         font-family: var(--main-font); font-weight: bold; font-size: 1.1rem; padding: 12px 15px; 
@@ -113,32 +124,73 @@
     .student-btn.completed { background-color: #ADB5BD; color: #495057; box-shadow: 0 4px 0 #868E96; text-decoration: line-through; opacity: 0.7; }
     .student-btn.completed:active { transform: translateY(4px); box-shadow: 0 0 0 #868E96; }
 
-    /* Part 1 */
+    /* Part 1: Lined Handwriting Paper Look */
     #sentence-container {
-        display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin: 20px 0 40px 0; max-width: 1200px; 
-        background: rgba(255,255,255,0.95); padding: 30px; border-radius: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        display: block; 
+        text-align: center; /* Natural writing flow centered */
+        width: 100%; 
+        max-width: 1200px; 
+        background-color: #fdfdfd; 
+        padding: 0 20px;
+        margin: auto 0; /* Vertically centers the paper on the screen */
+        border-radius: 10px; 
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        
+        /* The magical 3-line proper handwriting background */
+        background-image: url("data:image/svg+xml,%3Csvg width='20' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Cline x1='0' y1='25' x2='20' y2='25' stroke='%2390CDF4' stroke-width='2'/%3E%3Cline x1='0' y1='65' x2='20' y2='65' stroke='%2390CDF4' stroke-width='2' stroke-dasharray='6,4'/%3E%3Cline x1='0' y1='105' x2='20' y2='105' stroke='%23FC8181' stroke-width='2'/%3E%3C/svg%3E");
+        background-size: 20px 120px;
+        background-position: 0 0;
+        
+        min-height: 120px; /* At least one line */
     }
     .word-btn {
-        font-size: clamp(2rem, 4vw, 3rem); padding: 15px 25px; background-color: var(--correct); box-shadow: 0 8px 0 var(--correct-dark);
-        color: white; margin: 5px; min-height: auto; border:none; border-radius:15px; cursor: pointer; font-family: var(--main-font); font-weight: bold;
+        font-size: clamp(2.5rem, 4vw, 4.5rem); /* Scales beautifully to avoid scroll */
+        padding: 0 8px; /* space between words naturally */
+        background: transparent; 
+        box-shadow: none;
+        color: var(--text-dark); 
+        margin: 0; 
+        border: none; 
+        cursor: pointer; 
+        font-family: var(--main-font); 
+        font-weight: bold;
+        line-height: 120px; /* Perfectly matches the background line heights */
+        display: inline-block; 
+        vertical-align: top;
+        transition: color 0.1s;
     }
-    .word-btn.incorrect { background-color: var(--incorrect); box-shadow: 0 8px 0 var(--incorrect-dark); transform: scale(0.95) translateY(4px); opacity: 0.9; }
+    .word-btn:hover { background-color: rgba(0,0,0,0.03); border-radius: 5px; }
+    .word-btn.incorrect { 
+        background: transparent; 
+        box-shadow: none; 
+        color: var(--incorrect); /* Just turns red like a teacher's pen */
+    }
 
-    /* Part 2: 2x2 Grid (Updated for kid-friendly colors) */
-    .mcq-container { width: 100%; max-width: 900px; padding: 25px; border-radius: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); margin-bottom: 25px; box-sizing: border-box; }
+    /* Part 2: Horizontal Layout for Smartboard */
+    .mcq-wrapper { display: flex; flex-direction: row; gap: 20px; width: 100%; max-width: 1400px; justify-content: center; align-items: stretch; flex: 1; min-height: 0; padding-bottom: 10px;}
+    .mcq-container { width: 100%; flex: 1; padding: 20px; border-radius: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; margin-bottom: 0; }
     #mcq1 { background-color: #FFF3C4; border: 5px solid var(--primary); }
     #mcq2 { background-color: #D4EDDA; border: 5px solid var(--correct); }
-    .mcq-container h3 { margin: 0 0 15px 0; font-size: 1.8rem; color: var(--secondary-dark); }
-    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
-    .option-btn { font-family: var(--main-font); font-weight:bold; font-size: 1.5rem; padding: 20px; background-color: #FFFFFF; color: var(--text-dark); box-shadow: 0 6px 0 #CBD5E0; border:none; border-radius:15px; cursor:pointer; }
-    .option-btn.selected { background-color: var(--primary); box-shadow: 0 6px 0 var(--primary-dark); color: var(--secondary-dark); text-align: center; }
+    
+    /* Bigger questions, smaller options */
+    .mcq-container h3 { margin: 0 0 10px 0; font-size: clamp(1.8rem, 3vw, 2.5rem); color: var(--secondary-dark); text-align: center; }
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; flex-grow: 1; }
+    .option-btn { 
+        font-family: var(--main-font); font-weight:bold; font-size: clamp(1.2rem, 2vw, 1.4rem); 
+        padding: 8px 10px; background-color: #FFFFFF; color: var(--text-dark); 
+        box-shadow: 0 4px 0 #CBD5E0; border:none; border-radius:12px; cursor:pointer; 
+        display: flex; align-items: center; justify-content: center; min-height: 50px; 
+    }
+    .option-btn.selected { background-color: var(--primary); box-shadow: 0 4px 0 var(--primary-dark); color: var(--secondary-dark); text-align: center; }
 
-    /* Gear Icon */
-    #gear-btn {
-        position: absolute; top: 20px; right: 20px; background: var(--white); box-shadow: 0 6px 0 rgba(0,0,0,0.2); padding: 10px; border-radius: 50%;
+    /* Top Buttons */
+    .top-icon-btn {
+        position: absolute; top: 20px; background: var(--white); box-shadow: 0 6px 0 rgba(0,0,0,0.2); padding: 10px; border-radius: 50%;
         border: none; margin: 0; min-width: 60px; min-height: 60px; cursor: pointer; z-index: 100; display: flex; justify-content: center; align-items: center;
     }
-    #gear-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,0.2); }
+    .top-icon-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,0.2); }
+    #gear-btn { right: 20px; }
+    #fullscreen-btn { left: 20px; }
     
     /* DASHBOARD */
     #dashboard-modal, #help-modal {
@@ -199,13 +251,27 @@
     <!-- Animated Background -->
     <div id="floating-bg"></div>
 
-    <button id="gear-btn" onclick="openDashboard()">
+    <!-- Fullscreen Button -->
+    <button id="fullscreen-btn" class="top-icon-btn" onclick="toggleFullScreen()" title="Enter Fullscreen">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="var(--secondary-dark)">
+            <path d="M5 5h5v2H7v3H5V5zm9 0h5v5h-2V7h-3V5zm5 14h-5v-2h3v-3h2v5zm-14 0v-5h2v3h3v2H5z"/>
+        </svg>
+    </button>
+
+    <!-- Gear Button -->
+    <button id="gear-btn" class="top-icon-btn" onclick="openDashboard()" title="Settings">
         <svg width="30" height="30" viewBox="0 0 24 24" fill="var(--secondary-dark)">
             <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
         </svg>
     </button>
 
-    <div id="top-bar"><div id="timer-display">01:10</div></div>
+    <div id="top-bar">
+        <div class="timer-controls">
+            <button class="timer-ctrl-btn" onclick="addTime(10)">+10 Sec</button>
+            <div id="timer-display">01:10</div>
+            <button id="pause-btn" class="timer-ctrl-btn" onclick="togglePause()">⏸ Pause</button>
+        </div>
+    </div>
 
     <!-- Start Screen -->
     <div id="start-screen" class="screen active">
@@ -231,40 +297,46 @@
 
     <!-- Part 1 Screen -->
     <div id="part1-screen" class="screen">
-        <div style="display:flex; justify-content:space-between; width:100%; max-width:1200px; align-items:center;">
+        <div style="display:flex; justify-content:space-between; width:100%; max-width:1200px; align-items:center; flex: 0 0 auto;">
             <button class="game-btn back-btn" onclick="cancelTest()">🔙 Back</button>
             <h2 style="margin:0; text-align:center; flex-grow:1;">Part 1: Read Aloud 📖</h2>
             <div style="width: 140px;"></div>
         </div>
         
-        <p style="color:var(--primary); font-size:1.5rem; margin-top:10px;">Teacher: Tap words the student misses.</p>
+        <p style="color:var(--primary); font-size:1.5rem; margin: 10px 0 0 0; flex: 0 0 auto;">Teacher: Tap words the student misses.</p>
+        
         <div id="sentence-container"></div>
-        <button class="game-btn alt-btn" onclick="goToPart2()">Next: Part 2 ➔</button>
+        
+        <button class="game-btn alt-btn" onclick="goToPart2()" style="margin-bottom:0; flex: 0 0 auto;">Next: Part 2 ➔</button>
     </div>
 
     <!-- Part 2 Screen -->
     <div id="part2-screen" class="screen">
         <h2>Part 2: Multiple Choice ❓</h2>
-        <div id="mcq1" class="mcq-container">
-            <h3 id="q1-text">Question 1</h3>
-            <div class="options-grid" id="q1-options"></div>
+        <div class="mcq-wrapper">
+            <div id="mcq1" class="mcq-container">
+                <h3 id="q1-text">Question 1</h3>
+                <div class="options-grid" id="q1-options"></div>
+            </div>
+            <div id="mcq2" class="mcq-container">
+                <h3 id="q2-text">Question 2</h3>
+                <div class="options-grid" id="q2-options"></div>
+            </div>
         </div>
-        <div id="mcq2" class="mcq-container">
-            <h3 id="q2-text">Question 2</h3>
-            <div class="options-grid" id="q2-options"></div>
-        </div>
-        <button class="game-btn submit-btn" onclick="finishTest()">Finish & Submit ✅</button>
+        <button class="game-btn submit-btn" onclick="finishTest()" style="margin-top: 15px; margin-bottom: 0;">Finish & Submit ✅</button>
     </div>
 
     <!-- Result Screen -->
     <div id="result-screen" class="screen">
-        <h1 style="color:var(--primary);">🎉 Test Complete! 🎉</h1>
-        <h2 id="oral-grade-display" style="font-size: clamp(3rem, 6vw, 5rem); color: var(--accent-dark); background: white; padding: 15px 40px; border-radius: 20px; box-shadow: 0 8px 0 rgba(0,0,0,0.2); text-shadow:none; margin-bottom: 15px;">Oral Test Grade: 0</h2>
-        <h3 id="final-score-display" style="font-size: clamp(1.8rem, 3.5vw, 2.5rem); color: var(--secondary-dark); background: white; padding: 10px 30px; border-radius: 15px; box-shadow: 0 6px 0 rgba(0,0,0,0.2); text-shadow:none; margin-top: 0;">Total Score: 0</h3>
-        <p id="score-breakdown" style="font-size: 1.5rem; text-align: center; line-height: 1.8; background: white; color: var(--text-dark); padding: 20px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 8px 0 rgba(0,0,0,0.2); width: 100%; max-width: 800px; font-weight:bold;"></p>
+        <h1 style="color:var(--primary); margin: 0 0 10px 0;">🎉 Test Complete! 🎉</h1>
+        <h2 id="oral-grade-display" style="font-size: clamp(3rem, 5vw, 4.5rem); color: var(--accent-dark); background: white; padding: 10px 40px; border-radius: 20px; box-shadow: 0 8px 0 rgba(0,0,0,0.2); margin-bottom: 10px;">Oral Test Grade: 0</h2>
+        <h3 id="final-score-display" style="font-size: clamp(1.5rem, 3vw, 2rem); color: var(--secondary-dark); background: white; padding: 10px 30px; border-radius: 15px; box-shadow: 0 6px 0 rgba(0,0,0,0.2); margin-top: 0;">Total Score: 0</h3>
+        <p id="score-breakdown" style="font-size: 1.3rem; text-align: center; line-height: 1.6; background: white; color: var(--text-dark); padding: 15px; border-radius: 20px; margin-bottom: 15px; box-shadow: 0 8px 0 rgba(0,0,0,0.2); width: 100%; max-width: 800px; font-weight:bold;"></p>
         
-        <button id="submit-btn" class="game-btn submit-btn" onclick="submitToDrive()">Save to Google Drive ☁️</button>
-        <button class="game-btn alt-btn" onclick="resetGame()">Next Student ➔</button>
+        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+            <button id="submit-btn" class="game-btn submit-btn" style="margin: 0; padding: 15px 35px;" onclick="submitToDrive()">Save to Google Drive ☁️</button>
+            <button id="next-student-btn" class="game-btn alt-btn" style="margin: 0; padding: 15px 35px;" onclick="resetGame()">Next Student ➔</button>
+        </div>
     </div>
 
     <!-- Teacher Dashboard Modal -->
@@ -447,6 +519,20 @@ function doPost(e) {
     </div>
 
 <script>
+// --- Fullscreen API ---
+function toggleFullScreen() {
+    playClick();
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+            console.log(`Error attempting to enable full-screen mode: ${err.message}`);
+        });
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        }
+    }
+}
+
 // --- Helper Function: Safely encode text to prevent quotes from breaking inputs ---
 function escapeHTML(str) {
     if (str === null || str === undefined) return '';
@@ -486,8 +572,8 @@ const defaultConfig = {
     autoSyncGithub: true,
     grades: ["Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5", "Grade 6"],
     roster: [
-        { grade: "Grade 1", className: "101", students: ["01Jason", "12Nana"] },
-        { grade: "Grade 3", className: "301", students: ["05Peter", "13Bruce"] }
+        { grade: "Grade 1", className: "1A", students: ["John Doe", "Jane Smith", "Emily Chen", "Michael Wu"] },
+        { grade: "Grade 3", className: "3B", students: ["Peter Parker", "Bruce Wayne"] }
     ],
     tests: {
         "First Semester_Grade 1": [
@@ -633,6 +719,7 @@ function renderStudentGrid() {
 let currentClass = ""; let currentStudent = "";
 let activeCard = null; let timerInt = null; let timeLeft = config.timerSeconds || 70;
 let part1Score = 0; let part1Max = 20; let q1Score = 0; let q2Score = 0; let missedWordsArr = [];
+let isPaused = false;
 
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; }
@@ -680,12 +767,44 @@ function cancelTest() {
 
 function startTimer() {
     timeLeft = config.timerSeconds || 70;
+    isPaused = false;
+    
+    // Reset pause button visual state
+    const pauseBtn = document.getElementById('pause-btn');
+    pauseBtn.innerHTML = "⏸ Pause";
+    pauseBtn.style.backgroundColor = "var(--white)";
+    pauseBtn.style.color = "var(--secondary-dark)";
+
     document.getElementById('top-bar').style.display = 'flex'; updateTimerUI();
+    
     timerInt = setInterval(() => {
+        if (isPaused) return; // Freeze timer if paused
         timeLeft--; updateTimerUI();
         if(timeLeft <= 10 && timeLeft > 0) playWarning();
         if (timeLeft <= 0) { clearInterval(timerInt); finishTest(); }
     }, 1000);
+}
+
+function togglePause() {
+    playClick();
+    isPaused = !isPaused;
+    const pauseBtn = document.getElementById('pause-btn');
+    
+    if (isPaused) {
+        pauseBtn.innerHTML = "▶ Resume";
+        pauseBtn.style.backgroundColor = "var(--accent)";
+        pauseBtn.style.color = "white";
+    } else {
+        pauseBtn.innerHTML = "⏸ Pause";
+        pauseBtn.style.backgroundColor = "var(--white)";
+        pauseBtn.style.color = "var(--secondary-dark)";
+    }
+}
+
+function addTime(secs) {
+    playClick();
+    timeLeft += secs;
+    updateTimerUI();
 }
 
 function updateTimerUI() {
@@ -693,9 +812,10 @@ function updateTimerUI() {
     let s = (Math.max(0, timeLeft) % 60).toString().padStart(2, '0');
     let display = document.getElementById('timer-display');
     display.innerText = `${m}:${s}`;
-    if(timeLeft <= 10) { display.style.color = "var(--incorrect)"; display.style.borderColor = "var(--incorrect)"; } 
+    if(timeLeft <= 10 && !isPaused) { display.style.color = "var(--incorrect)"; display.style.borderColor = "var(--incorrect)"; } 
     else { display.style.color = "var(--secondary)"; display.style.borderColor = "var(--primary)"; }
 }
+
 function stopTimer() { clearInterval(timerInt); document.getElementById('top-bar').style.display = 'none'; }
 
 function setupPart1() {
@@ -737,7 +857,7 @@ function setupPart2() {
 }
 
 function renderMCQ(prefix, question, options, qNum) {
-    document.getElementById(`${prefix}-text`).innerText = `${qNum}. ${question} (${activeCard[prefix+'pts']} pts)`;
+    document.getElementById(`${prefix}-text`).innerHTML = `${qNum}. ${escapeHTML(question)} <span style="font-size: 0.55em; color: #777; font-weight: normal;">(${activeCard[prefix+'pts']} pts)</span>`;
     const grid = document.getElementById(`${prefix}-options`); grid.innerHTML = "";
     options.forEach((opt, idx) => {
         let btn = document.createElement('button'); btn.className = "option-btn"; btn.innerText = opt;
