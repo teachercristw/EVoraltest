@@ -259,7 +259,8 @@
     <!-- Result Screen -->
     <div id="result-screen" class="screen">
         <h1 style="color:var(--primary);">🎉 Test Complete! 🎉</h1>
-        <h2 id="final-score-display" style="font-size: clamp(2.5rem, 5vw, 4rem); color: var(--secondary-dark); background: white; padding: 20px 40px; border-radius: 20px; box-shadow: 0 8px 0 rgba(0,0,0,0.2); text-shadow:none;">Total Score: 0</h2>
+        <h2 id="oral-grade-display" style="font-size: clamp(3rem, 6vw, 5rem); color: var(--accent-dark); background: white; padding: 15px 40px; border-radius: 20px; box-shadow: 0 8px 0 rgba(0,0,0,0.2); text-shadow:none; margin-bottom: 15px;">Oral Test Grade: 0</h2>
+        <h3 id="final-score-display" style="font-size: clamp(1.8rem, 3.5vw, 2.5rem); color: var(--secondary-dark); background: white; padding: 10px 30px; border-radius: 15px; box-shadow: 0 6px 0 rgba(0,0,0,0.2); text-shadow:none; margin-top: 0;">Total Score: 0</h3>
         <p id="score-breakdown" style="font-size: 1.5rem; text-align: center; line-height: 1.8; background: white; color: var(--text-dark); padding: 20px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 8px 0 rgba(0,0,0,0.2); width: 100%; max-width: 800px; font-weight:bold;"></p>
         
         <button id="submit-btn" class="game-btn submit-btn" onclick="submitToDrive()">Save to Google Drive ☁️</button>
@@ -427,12 +428,12 @@ function doPost(e) {
     spreadsheet = SpreadsheetApp.create(sheetName);
     DriveApp.getFileById(spreadsheet.getId()).moveTo(classFolder);
     var sheet = spreadsheet.getActiveSheet();
-    sheet.appendRow(["Date/Time", "Student Name", "Total Score (30)", "Reading Score", "Missed Words", "Q1 Score", "Q2 Score"]);
-    sheet.getRange("A1:G1").setFontWeight("bold").setBackground("#FFD166");
-    sheet.setColumnWidth(5, 400); 
+    sheet.appendRow(["Date/Time", "Student Name", "Oral Test Grade", "Total Score (30)", "Reading Score", "Missed Words", "Q1 Score", "Q2 Score"]);
+    sheet.getRange("A1:H1").setFontWeight("bold").setBackground("#FFD166");
+    sheet.setColumnWidth(6, 400); 
   }
 
-  spreadsheet.getActiveSheet().appendRow([timestamp, data.studentName, data.totalScore, data.readingScore, data.missedWords, data.q1Score, data.q2Score]);
+  spreadsheet.getActiveSheet().appendRow([timestamp, data.studentName, data.oralGrade, data.totalScore, data.readingScore, data.missedWords, data.q1Score, data.q2Score]);
   return ContentService.createTextOutput(JSON.stringify({"status": "success"})).setMimeType(ContentService.MimeType.JSON);
 }
             </textarea>
@@ -755,8 +756,12 @@ function finishTest() {
     playSuccess(); stopTimer();
     if(document.getElementById('part1-screen').classList.contains('active')) calculatePart1Score();
     let totalScore = part1Score + q1Score + q2Score;
+    let oralGrade = 70 + totalScore;
     let maximumPossible = part1Max + parseInt(activeCard.q1pts) + parseInt(activeCard.q2pts);
+    
+    document.getElementById('oral-grade-display').innerText = `Oral Test Grade: ${oralGrade}`;
     document.getElementById('final-score-display').innerText = `Total Score: ${totalScore} / ${maximumPossible}`;
+    
     let missedText = missedWordsArr.length > 0 ? `<br><span style="color:var(--incorrect)">Missed Words: ${missedWordsArr.join(', ')}</span>` : '<br><span style="color:var(--correct)">Perfect Reading! 🎉</span>';
     document.getElementById('score-breakdown').innerHTML = `Reading: <b>${part1Score}/${part1Max}</b> &nbsp;|&nbsp; Q1: <b>${q1Score}/${activeCard.q1pts}</b> &nbsp;|&nbsp; Q2: <b>${q2Score}/${activeCard.q2pts}</b> ${missedText}`;
     
@@ -776,6 +781,7 @@ function submitToDrive() {
         grade: document.getElementById('start-grade').value, 
         className: currentClass, 
         studentName: currentStudent,
+        oralGrade: 70 + part1Score + q1Score + q2Score,
         totalScore: part1Score + q1Score + q2Score, readingScore: part1Score, q1Score: q1Score, q2Score: q2Score, missedWords: missedWordsArr.join(", ") || "None"
     };
 
